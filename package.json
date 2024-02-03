@@ -1,0 +1,24 @@
+{
+  "name": "budget-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run watch-app\" \"npm run watch-api\"",
+    "watch-app": "nodemon --watch app/src --exec 'docker compose up --build --detach budget-app'",
+    "watch-api": "nodemon --watch api --exec 'docker compose up --build --detach budget-api'"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "app/src",
+      "api"
+    ],
+    "ext": "js,jsx,ts,tsx,cs",
+    "execMap": {
+      "js": "node --harmony"
+    }
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.3"
+  }
+}
