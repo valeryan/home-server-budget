@@ -12,7 +12,7 @@
       "app/src",
       "api"
     ],
-    "ext": "js,jsx,ts,tsx,cs",
+    "ext": "js,jsx,ts,tsx,cs,csproj",
     "execMap": {
       "js": "node --harmony"
     }

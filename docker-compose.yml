@@ -15,6 +15,7 @@ services:
       - 'VIRTUAL_NETWORK=${PROXY_HOST}'
       - 'VIRTUAL_PORT=5020'
       - 'ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}'
+      - 'CONNECTION_STRING=${CONNECTION_STRING}'
     networks:
       - proxy-net
 

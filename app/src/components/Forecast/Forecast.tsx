@@ -14,7 +14,7 @@ const Forecast: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("./api/forecast");
+      const response = await fetch("./api/v1/WeatherForecast");
       const data = await response.json();
       setForecastData(data);
     } catch (error) {

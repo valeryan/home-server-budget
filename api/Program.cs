@@ -1,52 +1,70 @@
+using Asp.Versioning;
+using BudgetApi.Context;
+using BudgetApi.Swagger;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder
+    .Services.AddApiVersioning(o =>
+    {
+        o.DefaultApiVersion = new ApiVersion(1, 0);
+        o.ReportApiVersions = true;
+        o.ApiVersionReader = new UrlSegmentApiVersionReader();
+    })
+    .AddApiExplorer(options =>
+    {
+        options.GroupNameFormat = "'v'VVV";
+        options.SubstituteApiVersionInUrl = true;
+    });
+
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+builder.Services.AddSwaggerGen(options =>
+{
+    // Add a custom operation filter which sets default values
+    options.OperationFilter<SwaggerDefaultValues>();
+});
+
+// Access the connection string from environment variables
+string? connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+if (string.IsNullOrEmpty(connectionString))
+{
+    // Log an error or throw an exception, depending on your application's requirements
+    Console.Error.WriteLine("Error: Connection string is missing or empty.");
+    // Alternatively, you can throw an exception to stop the application startup
+    throw new InvalidOperationException("Connection string is missing or empty.");
+}
+builder.Services.AddDbContext<MySqlDbContext>(options => {
+    options.UseMySql(connectionString, ServerVersion.Parse("8.0.23-mysql"));
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UsePathBase("/api");
+
 if (app.Environment.IsDevelopment())
 {
-    // Set the Swagger endpoint to /api/swagger/{documentName}/swagger.json
-    app.UseSwagger(c =>
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
     {
-        c.RouteTemplate = "api/swagger/{documentName}/swagger.json";
-    });
+        var descriptions = app.DescribeApiVersions();
 
-    // Set the Swagger UI to /api/swagger
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "V1");
-        c.RoutePrefix = "api/swagger";
+        // Build a swagger endpoint for each discovered API version
+        foreach (var description in descriptions)
+        {
+            var url = $"/api/swagger/{description.GroupName}/swagger.json";
+            var name = description.GroupName.ToUpperInvariant();
+            options.SwaggerEndpoint(url, name);
+        }
     });
 }
 
-var summaries = new[]
-{
-    "Smelty", "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/api/forecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetForecast")
-.WithOpenApi();
-
+app.MapControllers();
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
