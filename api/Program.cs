@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
+DotNetEnv.Env.TraversePath().Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -34,6 +36,8 @@ builder.Services.AddSwaggerGen(options =>
 
 // Access the connection string from environment variables
 string? connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+var serverVersion = new MySqlServerVersion(new Version(8, 0, 23));
+
 if (string.IsNullOrEmpty(connectionString))
 {
     // Log an error or throw an exception, depending on your application's requirements
@@ -42,7 +46,7 @@ if (string.IsNullOrEmpty(connectionString))
     throw new InvalidOperationException("Connection string is missing or empty.");
 }
 builder.Services.AddDbContext<MySqlDbContext>(options => {
-    options.UseMySql(connectionString, ServerVersion.Parse("8.0.23-mysql"));
+    options.UseMySql(connectionString, serverVersion);
 });
 
 var app = builder.Build();
