@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BudgetApi.Migrations
 {
     [DbContext(typeof(MySqlDbContext))]
-    [Migration("20240205050015_InitialMigration")]
+    [Migration("20240212051640_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -24,7 +24,7 @@ namespace BudgetApi.Migrations
 
             modelBuilder.Entity("BudgetApi.Models.Account", b =>
                 {
-                    b.Property<int>("AccountId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
@@ -39,16 +39,41 @@ namespace BudgetApi.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.HasKey("AccountId");
+                    b.HasKey("Id");
 
                     b.HasIndex("BalanceId");
 
                     b.ToTable("Accounts");
                 });
 
+            modelBuilder.Entity("BudgetApi.Models.ApplicationData", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Discriminator")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ApplicationData");
+
+                    b.HasDiscriminator<int>("Discriminator");
+
+                    b.UseTphMappingStrategy();
+                });
+
             modelBuilder.Entity("BudgetApi.Models.Balance", b =>
                 {
-                    b.Property<int>("BalanceId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
@@ -61,14 +86,14 @@ namespace BudgetApi.Migrations
                     b.Property<decimal>("StartBalance")
                         .HasColumnType("decimal(65,30)");
 
-                    b.HasKey("BalanceId");
+                    b.HasKey("Id");
 
                     b.ToTable("Balances");
                 });
 
             modelBuilder.Entity("BudgetApi.Models.Budget", b =>
                 {
-                    b.Property<int>("BudgetId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
@@ -82,7 +107,7 @@ namespace BudgetApi.Migrations
                     b.Property<string>("ScheduleParams")
                         .HasColumnType("json");
 
-                    b.HasKey("BudgetId");
+                    b.HasKey("Id");
 
                     b.HasIndex("ScheduleId");
 
@@ -91,7 +116,7 @@ namespace BudgetApi.Migrations
 
             modelBuilder.Entity("BudgetApi.Models.BudgetPeriod", b =>
                 {
-                    b.Property<int>("BudgetPeriodId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
@@ -104,7 +129,7 @@ namespace BudgetApi.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime(6)");
 
-                    b.HasKey("BudgetPeriodId");
+                    b.HasKey("Id");
 
                     b.HasIndex("BudgetId");
 
@@ -113,7 +138,7 @@ namespace BudgetApi.Migrations
 
             modelBuilder.Entity("BudgetApi.Models.Expense", b =>
                 {
-                    b.Property<int>("ExpenseId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
@@ -123,6 +148,9 @@ namespace BudgetApi.Migrations
                     b.Property<int?>("BalanceId")
                         .HasColumnType("int");
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("HasBalance")
                         .HasColumnType("tinyint(1)");
 
@@ -130,15 +158,22 @@ namespace BudgetApi.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int>("PayeeId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ScheduleId")
                         .HasColumnType("int");
 
                     b.Property<string>("ScheduleParams")
                         .HasColumnType("json");
 
-                    b.HasKey("ExpenseId");
+                    b.HasKey("Id");
 
                     b.HasIndex("BalanceId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("PayeeId");
 
                     b.HasIndex("ScheduleId");
 
@@ -147,16 +182,22 @@ namespace BudgetApi.Migrations
 
             modelBuilder.Entity("BudgetApi.Models.Income", b =>
                 {
-                    b.Property<int>("IncomeId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(65,30)");
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int>("PayeeId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ScheduleId")
                         .HasColumnType("int");
@@ -164,26 +205,15 @@ namespace BudgetApi.Migrations
                     b.Property<string>("ScheduleParams")
                         .HasColumnType("json");
 
-                    b.HasKey("IncomeId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("PayeeId");
 
                     b.HasIndex("ScheduleId");
 
                     b.ToTable("Incomes");
-                });
-
-            modelBuilder.Entity("BudgetApi.Models.Schedule", b =>
-                {
-                    b.Property<int>("ScheduleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("ScheduleId");
-
-                    b.ToTable("Schedules");
                 });
 
             modelBuilder.Entity("BudgetApi.Models.Transaction", b =>
@@ -201,6 +231,9 @@ namespace BudgetApi.Migrations
                     b.Property<int>("BudgetPeriodId")
                         .HasColumnType("int");
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime(6)");
 
@@ -210,17 +243,45 @@ namespace BudgetApi.Migrations
                     b.Property<int?>("IncomeId")
                         .HasColumnType("int");
 
+                    b.Property<int>("PayeeId")
+                        .HasColumnType("int");
+
                     b.HasKey("TransactionId");
 
                     b.HasIndex("AccountId");
 
                     b.HasIndex("BudgetPeriodId");
 
+                    b.HasIndex("CategoryId");
+
                     b.HasIndex("ExpenseId");
 
                     b.HasIndex("IncomeId");
 
+                    b.HasIndex("PayeeId");
+
                     b.ToTable("Transactions");
+                });
+
+            modelBuilder.Entity("BudgetApi.Models.Category", b =>
+                {
+                    b.HasBaseType("BudgetApi.Models.ApplicationData");
+
+                    b.HasDiscriminator().HasValue(2);
+                });
+
+            modelBuilder.Entity("BudgetApi.Models.Payee", b =>
+                {
+                    b.HasBaseType("BudgetApi.Models.ApplicationData");
+
+                    b.HasDiscriminator().HasValue(3);
+                });
+
+            modelBuilder.Entity("BudgetApi.Models.Schedule", b =>
+                {
+                    b.HasBaseType("BudgetApi.Models.ApplicationData");
+
+                    b.HasDiscriminator().HasValue(1);
                 });
 
             modelBuilder.Entity("BudgetApi.Models.Account", b =>
@@ -262,6 +323,18 @@ namespace BudgetApi.Migrations
                         .WithMany()
                         .HasForeignKey("BalanceId");
 
+                    b.HasOne("BudgetApi.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BudgetApi.Models.Payee", "Payee")
+                        .WithMany()
+                        .HasForeignKey("PayeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("BudgetApi.Models.Schedule", "Schedule")
                         .WithMany()
                         .HasForeignKey("ScheduleId")
@@ -270,16 +343,36 @@ namespace BudgetApi.Migrations
 
                     b.Navigation("Balance");
 
+                    b.Navigation("Category");
+
+                    b.Navigation("Payee");
+
                     b.Navigation("Schedule");
                 });
 
             modelBuilder.Entity("BudgetApi.Models.Income", b =>
                 {
+                    b.HasOne("BudgetApi.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BudgetApi.Models.Payee", "Payee")
+                        .WithMany()
+                        .HasForeignKey("PayeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("BudgetApi.Models.Schedule", "Schedule")
                         .WithMany()
                         .HasForeignKey("ScheduleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Payee");
 
                     b.Navigation("Schedule");
                 });
@@ -298,6 +391,12 @@ namespace BudgetApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BudgetApi.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("BudgetApi.Models.Expense", "Expense")
                         .WithMany("Transactions")
                         .HasForeignKey("ExpenseId");
@@ -306,13 +405,23 @@ namespace BudgetApi.Migrations
                         .WithMany("Transactions")
                         .HasForeignKey("IncomeId");
 
+                    b.HasOne("BudgetApi.Models.Payee", "Payee")
+                        .WithMany()
+                        .HasForeignKey("PayeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Account");
 
                     b.Navigation("BudgetPeriod");
 
+                    b.Navigation("Category");
+
                     b.Navigation("Expense");
 
                     b.Navigation("Income");
+
+                    b.Navigation("Payee");
                 });
 
             modelBuilder.Entity("BudgetApi.Models.Budget", b =>

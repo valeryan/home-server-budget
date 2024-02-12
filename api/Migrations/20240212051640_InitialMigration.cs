@@ -16,10 +16,28 @@ namespace BudgetApi.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "ApplicationData",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Discriminator = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ApplicationData", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Balances",
                 columns: table => new
                 {
-                    BalanceId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     StartBalance = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
                     CurrentBalance = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
@@ -27,22 +45,70 @@ namespace BudgetApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Balances", x => x.BalanceId);
+                    table.PrimaryKey("PK_Balances", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Schedules",
+                name: "Budgets",
                 columns: table => new
                 {
-                    ScheduleId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ScheduleId = table.Column<int>(type: "int", nullable: false),
+                    ScheduleParams = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Schedules", x => x.ScheduleId);
+                    table.PrimaryKey("PK_Budgets", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Budgets_ApplicationData_ScheduleId",
+                        column: x => x.ScheduleId,
+                        principalTable: "ApplicationData",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Incomes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Amount = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    ScheduleId = table.Column<int>(type: "int", nullable: false),
+                    ScheduleParams = table.Column<string>(type: "json", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    PayeeId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Incomes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Incomes_ApplicationData_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "ApplicationData",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Incomes_ApplicationData_PayeeId",
+                        column: x => x.PayeeId,
+                        principalTable: "ApplicationData",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Incomes_ApplicationData_ScheduleId",
+                        column: x => x.ScheduleId,
+                        principalTable: "ApplicationData",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -50,7 +116,7 @@ namespace BudgetApi.Migrations
                 name: "Accounts",
                 columns: table => new
                 {
-                    AccountId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -60,36 +126,12 @@ namespace BudgetApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Accounts", x => x.AccountId);
+                    table.PrimaryKey("PK_Accounts", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Accounts_Balances_BalanceId",
                         column: x => x.BalanceId,
                         principalTable: "Balances",
-                        principalColumn: "BalanceId",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Budgets",
-                columns: table => new
-                {
-                    BudgetId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ScheduleId = table.Column<int>(type: "int", nullable: false),
-                    ScheduleParams = table.Column<string>(type: "json", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Budgets", x => x.BudgetId);
-                    table.ForeignKey(
-                        name: "FK_Budgets_Schedules_ScheduleId",
-                        column: x => x.ScheduleId,
-                        principalTable: "Schedules",
-                        principalColumn: "ScheduleId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -98,7 +140,7 @@ namespace BudgetApi.Migrations
                 name: "Expenses",
                 columns: table => new
                 {
-                    ExpenseId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -107,47 +149,36 @@ namespace BudgetApi.Migrations
                     ScheduleParams = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     HasBalance = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    BalanceId = table.Column<int>(type: "int", nullable: true)
+                    BalanceId = table.Column<int>(type: "int", nullable: true),
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    PayeeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Expenses", x => x.ExpenseId);
+                    table.PrimaryKey("PK_Expenses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Expenses_ApplicationData_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "ApplicationData",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Expenses_ApplicationData_PayeeId",
+                        column: x => x.PayeeId,
+                        principalTable: "ApplicationData",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Expenses_ApplicationData_ScheduleId",
+                        column: x => x.ScheduleId,
+                        principalTable: "ApplicationData",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Expenses_Balances_BalanceId",
                         column: x => x.BalanceId,
                         principalTable: "Balances",
-                        principalColumn: "BalanceId");
-                    table.ForeignKey(
-                        name: "FK_Expenses_Schedules_ScheduleId",
-                        column: x => x.ScheduleId,
-                        principalTable: "Schedules",
-                        principalColumn: "ScheduleId",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Incomes",
-                columns: table => new
-                {
-                    IncomeId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Amount = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
-                    ScheduleId = table.Column<int>(type: "int", nullable: false),
-                    ScheduleParams = table.Column<string>(type: "json", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Incomes", x => x.IncomeId);
-                    table.ForeignKey(
-                        name: "FK_Incomes_Schedules_ScheduleId",
-                        column: x => x.ScheduleId,
-                        principalTable: "Schedules",
-                        principalColumn: "ScheduleId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -155,7 +186,7 @@ namespace BudgetApi.Migrations
                 name: "BudgetPeriods",
                 columns: table => new
                 {
-                    BudgetPeriodId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     BudgetId = table.Column<int>(type: "int", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
@@ -163,12 +194,12 @@ namespace BudgetApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BudgetPeriods", x => x.BudgetPeriodId);
+                    table.PrimaryKey("PK_BudgetPeriods", x => x.Id);
                     table.ForeignKey(
                         name: "FK_BudgetPeriods_Budgets_BudgetId",
                         column: x => x.BudgetId,
                         principalTable: "Budgets",
-                        principalColumn: "BudgetId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -183,6 +214,8 @@ namespace BudgetApi.Migrations
                     Date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     AccountId = table.Column<int>(type: "int", nullable: false),
                     BudgetPeriodId = table.Column<int>(type: "int", nullable: false),
+                    PayeeId = table.Column<int>(type: "int", nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
                     IncomeId = table.Column<int>(type: "int", nullable: true),
                     ExpenseId = table.Column<int>(type: "int", nullable: true)
                 },
@@ -193,24 +226,36 @@ namespace BudgetApi.Migrations
                         name: "FK_Transactions_Accounts_AccountId",
                         column: x => x.AccountId,
                         principalTable: "Accounts",
-                        principalColumn: "AccountId",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Transactions_ApplicationData_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "ApplicationData",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Transactions_ApplicationData_PayeeId",
+                        column: x => x.PayeeId,
+                        principalTable: "ApplicationData",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Transactions_BudgetPeriods_BudgetPeriodId",
                         column: x => x.BudgetPeriodId,
                         principalTable: "BudgetPeriods",
-                        principalColumn: "BudgetPeriodId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Transactions_Expenses_ExpenseId",
                         column: x => x.ExpenseId,
                         principalTable: "Expenses",
-                        principalColumn: "ExpenseId");
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Transactions_Incomes_IncomeId",
                         column: x => x.IncomeId,
                         principalTable: "Incomes",
-                        principalColumn: "IncomeId");
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -235,9 +280,29 @@ namespace BudgetApi.Migrations
                 column: "BalanceId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Expenses_CategoryId",
+                table: "Expenses",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Expenses_PayeeId",
+                table: "Expenses",
+                column: "PayeeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Expenses_ScheduleId",
                 table: "Expenses",
                 column: "ScheduleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Incomes_CategoryId",
+                table: "Incomes",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Incomes_PayeeId",
+                table: "Incomes",
+                column: "PayeeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Incomes_ScheduleId",
@@ -255,6 +320,11 @@ namespace BudgetApi.Migrations
                 column: "BudgetPeriodId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Transactions_CategoryId",
+                table: "Transactions",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Transactions_ExpenseId",
                 table: "Transactions",
                 column: "ExpenseId");
@@ -263,6 +333,11 @@ namespace BudgetApi.Migrations
                 name: "IX_Transactions_IncomeId",
                 table: "Transactions",
                 column: "IncomeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_PayeeId",
+                table: "Transactions",
+                column: "PayeeId");
         }
 
         /// <inheritdoc />
@@ -290,7 +365,7 @@ namespace BudgetApi.Migrations
                 name: "Balances");
 
             migrationBuilder.DropTable(
-                name: "Schedules");
+                name: "ApplicationData");
         }
     }
 }

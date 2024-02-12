@@ -15,13 +15,26 @@ namespace BudgetApi.Context
         public DbSet<BudgetPeriod> BudgetPeriods { get; set; }
         public DbSet<Expense> Expenses { get; set; }
         public DbSet<Income> Incomes { get; set; }
-        public DbSet<Schedule> Schedules { get; set; }
+        public DbSet<ApplicationData> ApplicationData { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<ApplicationData> Categories { get; set; }
+        public DbSet<ApplicationData> Payees { get; set; }
+        public DbSet<ApplicationData> Schedules { get; set; }
 
         // Add more DbSet properties as needed for other entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<ApplicationData>()
+                .HasDiscriminator<ApplicationDataType>("Discriminator")
+                .HasValue<Schedule>(ApplicationDataType.Schedule)
+                .HasValue<Category>(ApplicationDataType.Category)
+                .HasValue<Payee>(ApplicationDataType.Payee);
+
+            modelBuilder.Entity<ApplicationData>()
+                .Property(a => a.Discriminator)
+                .IsRequired();
+
             // Income Budget, and Expense to Schedule
             modelBuilder
                 .Entity<Income>()
@@ -31,10 +44,38 @@ namespace BudgetApi.Context
                 .IsRequired();
 
             modelBuilder
+                .Entity<Income>()
+                .HasOne(i => i.Payee)
+                .WithMany()
+                .HasForeignKey(i => i.PayeeId)
+                .IsRequired();
+
+            modelBuilder
+                .Entity<Income>()
+                .HasOne(i => i.Category)
+                .WithMany()
+                .HasForeignKey(i => i.CategoryId)
+                .IsRequired();
+
+            modelBuilder
                 .Entity<Expense>()
                 .HasOne(e => e.Schedule)
                 .WithMany()
                 .HasForeignKey(e => e.ScheduleId)
+                .IsRequired();
+
+            modelBuilder
+                .Entity<Expense>()
+                .HasOne(e => e.Payee)
+                .WithMany()
+                .HasForeignKey(e => e.PayeeId)
+                .IsRequired();
+
+            modelBuilder
+                .Entity<Expense>()
+                .HasOne(e => e.Category)
+                .WithMany()
+                .HasForeignKey(e => e.CategoryId)
                 .IsRequired();
 
             modelBuilder
@@ -59,7 +100,7 @@ namespace BudgetApi.Context
                 .HasForeignKey(e => e.BalanceId)
                 .IsRequired();
 
-            // Transaction to Account
+            // Transaction
             modelBuilder
                 .Entity<Transaction>()
                 .HasOne(t => t.Account)
@@ -67,12 +108,25 @@ namespace BudgetApi.Context
                 .HasForeignKey(t => t.AccountId)
                 .IsRequired();
 
-            // Transaction to BudgetPeriod
             modelBuilder
                 .Entity<Transaction>()
                 .HasOne(t => t.BudgetPeriod)
                 .WithMany()
                 .HasForeignKey(t => t.BudgetPeriodId)
+                .IsRequired();
+
+            modelBuilder
+                .Entity<Transaction>()
+                .HasOne(t => t.Payee)
+                .WithMany()
+                .HasForeignKey(t => t.PayeeId)
+                .IsRequired();
+
+            modelBuilder
+                .Entity<Transaction>()
+                .HasOne(t => t.Category)
+                .WithMany()
+                .HasForeignKey(t => t.CategoryId)
                 .IsRequired();
 
             // Transaction to Income or Expense (optional)

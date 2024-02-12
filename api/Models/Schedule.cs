@@ -1,8 +1,10 @@
 namespace BudgetApi.Models
 {
-    public class Schedule
+    public class Schedule: ApplicationData
     {
-        public int ScheduleId { get; set; }
-        public required string Name { get; set; }
+        public Schedule()
+        {
+            Discriminator = ApplicationDataType.Schedule;
+        }
     }
 }

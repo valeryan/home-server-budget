@@ -2,7 +2,7 @@ namespace BudgetApi.Models
 {
     public class Budget
     {
-        public int BudgetId { get; set; }
+        public int Id { get; set; }
         public required string Name { get; set; }
         public int ScheduleId { get; set; }
         public string? ScheduleParams { get; set; }
