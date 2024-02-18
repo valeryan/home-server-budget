@@ -2,3 +2,7 @@
 .config
 .vscode
 node_modules
+
+# Dotnet CSharp
+obj
+bin
