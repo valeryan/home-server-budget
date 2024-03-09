@@ -1,4 +1,6 @@
+using BudgetApp.Domain.Contracts.Persistence;
 using BudgetApp.Infrastructure.Context;
+using BudgetApp.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,6 +25,16 @@ namespace BudgetApp.Infrastructure
             {
                 options.UseMySql(connectionString, serverVersion);
             });
+
+            services.AddRepositories();
+
+            return services;
+        }
+
+        public static IServiceCollection AddRepositories(this IServiceCollection services)
+        {
+            services.AddScoped<IAccountRepository, AccountRepository>();
+
             return services;
         }
     }

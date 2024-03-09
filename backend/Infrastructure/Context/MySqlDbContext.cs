@@ -1,4 +1,4 @@
-using BudgetApp.Infrastructure.Models;
+using BudgetApp.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BudgetApp.Infrastructure.Context

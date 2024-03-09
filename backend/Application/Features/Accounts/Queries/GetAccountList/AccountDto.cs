@@ -1,10 +1,11 @@
-namespace BudgetApp.Infrastructure.Models
+
+namespace BudgetApp.Application.Features.Accounts.Queries.GetAccountList
 {
-    public abstract class ApplicationData
+    public class AccountDto
     {
         public int Id { get; set; }
         public required string Name { get; set; }
         public string? Description { get; set; }
-        public virtual ApplicationDataType Type { get; set; }
+        public int BalanceId { get; set; }
     }
 }

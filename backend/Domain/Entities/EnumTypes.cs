@@ -1,4 +1,4 @@
-namespace BudgetApp.Infrastructure.Models
+namespace BudgetApp.Domain.Entities
 {
     public enum ApplicationDataType
     {

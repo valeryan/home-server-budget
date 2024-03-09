@@ -19,7 +19,7 @@ namespace BudgetApp.Api.Migrations
                 .HasAnnotation("ProductVersion", "7.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.Account", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.Account", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -42,7 +42,7 @@ namespace BudgetApp.Api.Migrations
                     b.ToTable("Accounts");
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.ApplicationData", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.ApplicationData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -67,7 +67,7 @@ namespace BudgetApp.Api.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.Balance", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.Balance", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -87,7 +87,7 @@ namespace BudgetApp.Api.Migrations
                     b.ToTable("Balances");
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.Budget", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.Budget", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -110,7 +110,7 @@ namespace BudgetApp.Api.Migrations
                     b.ToTable("Budgets");
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.BudgetPeriod", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.BudgetPeriod", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -132,7 +132,7 @@ namespace BudgetApp.Api.Migrations
                     b.ToTable("BudgetPeriods");
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.Expense", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.Expense", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -176,7 +176,7 @@ namespace BudgetApp.Api.Migrations
                     b.ToTable("Expenses");
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.Income", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.Income", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -212,7 +212,7 @@ namespace BudgetApp.Api.Migrations
                     b.ToTable("Incomes");
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.Transaction", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.Transaction", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -258,21 +258,21 @@ namespace BudgetApp.Api.Migrations
                     b.ToTable("Transactions");
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.Category", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.Category", b =>
                 {
-                    b.HasBaseType("BudgetApp.Infrastructure.Models.ApplicationData");
+                    b.HasBaseType("BudgetApp.Domain.Entities.ApplicationData");
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.Payee", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.Payee", b =>
                 {
-                    b.HasBaseType("BudgetApp.Infrastructure.Models.ApplicationData");
+                    b.HasBaseType("BudgetApp.Domain.Entities.ApplicationData");
 
                     b.HasDiscriminator().HasValue(2);
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.Schedule", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.Schedule", b =>
                 {
-                    b.HasBaseType("BudgetApp.Infrastructure.Models.ApplicationData");
+                    b.HasBaseType("BudgetApp.Domain.Entities.ApplicationData");
 
                     b.HasDiscriminator().HasValue(1);
 
@@ -335,9 +335,9 @@ namespace BudgetApp.Api.Migrations
                         });
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.ExpenseCategory", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.ExpenseCategory", b =>
                 {
-                    b.HasBaseType("BudgetApp.Infrastructure.Models.Category");
+                    b.HasBaseType("BudgetApp.Domain.Entities.Category");
 
                     b.HasDiscriminator().HasValue(4);
 
@@ -414,9 +414,9 @@ namespace BudgetApp.Api.Migrations
                         });
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.IncomeCategory", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.IncomeCategory", b =>
                 {
-                    b.HasBaseType("BudgetApp.Infrastructure.Models.Category");
+                    b.HasBaseType("BudgetApp.Domain.Entities.Category");
 
                     b.HasDiscriminator().HasValue(3);
 
@@ -458,9 +458,9 @@ namespace BudgetApp.Api.Migrations
                         });
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.Account", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.Account", b =>
                 {
-                    b.HasOne("BudgetApp.Infrastructure.Models.Balance", "Balance")
+                    b.HasOne("BudgetApp.Domain.Entities.Balance", "Balance")
                         .WithMany()
                         .HasForeignKey("BalanceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -469,9 +469,9 @@ namespace BudgetApp.Api.Migrations
                     b.Navigation("Balance");
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.Budget", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.Budget", b =>
                 {
-                    b.HasOne("BudgetApp.Infrastructure.Models.Schedule", "Schedule")
+                    b.HasOne("BudgetApp.Domain.Entities.Schedule", "Schedule")
                         .WithMany()
                         .HasForeignKey("ScheduleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -480,9 +480,9 @@ namespace BudgetApp.Api.Migrations
                     b.Navigation("Schedule");
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.BudgetPeriod", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.BudgetPeriod", b =>
                 {
-                    b.HasOne("BudgetApp.Infrastructure.Models.Budget", "Budget")
+                    b.HasOne("BudgetApp.Domain.Entities.Budget", "Budget")
                         .WithMany("BudgetPeriods")
                         .HasForeignKey("BudgetId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -491,25 +491,25 @@ namespace BudgetApp.Api.Migrations
                     b.Navigation("Budget");
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.Expense", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.Expense", b =>
                 {
-                    b.HasOne("BudgetApp.Infrastructure.Models.Balance", "Balance")
+                    b.HasOne("BudgetApp.Domain.Entities.Balance", "Balance")
                         .WithMany()
                         .HasForeignKey("BalanceId");
 
-                    b.HasOne("BudgetApp.Infrastructure.Models.ExpenseCategory", "Category")
+                    b.HasOne("BudgetApp.Domain.Entities.ExpenseCategory", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BudgetApp.Infrastructure.Models.Payee", "Payee")
+                    b.HasOne("BudgetApp.Domain.Entities.Payee", "Payee")
                         .WithMany()
                         .HasForeignKey("PayeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BudgetApp.Infrastructure.Models.Schedule", "Schedule")
+                    b.HasOne("BudgetApp.Domain.Entities.Schedule", "Schedule")
                         .WithMany()
                         .HasForeignKey("ScheduleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -524,21 +524,21 @@ namespace BudgetApp.Api.Migrations
                     b.Navigation("Schedule");
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.Income", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.Income", b =>
                 {
-                    b.HasOne("BudgetApp.Infrastructure.Models.IncomeCategory", "Category")
+                    b.HasOne("BudgetApp.Domain.Entities.IncomeCategory", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BudgetApp.Infrastructure.Models.Payee", "Payee")
+                    b.HasOne("BudgetApp.Domain.Entities.Payee", "Payee")
                         .WithMany()
                         .HasForeignKey("PayeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BudgetApp.Infrastructure.Models.Schedule", "Schedule")
+                    b.HasOne("BudgetApp.Domain.Entities.Schedule", "Schedule")
                         .WithMany()
                         .HasForeignKey("ScheduleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -551,27 +551,27 @@ namespace BudgetApp.Api.Migrations
                     b.Navigation("Schedule");
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.Transaction", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.Transaction", b =>
                 {
-                    b.HasOne("BudgetApp.Infrastructure.Models.Account", "Account")
+                    b.HasOne("BudgetApp.Domain.Entities.Account", "Account")
                         .WithMany()
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BudgetApp.Infrastructure.Models.BudgetPeriod", "BudgetPeriod")
+                    b.HasOne("BudgetApp.Domain.Entities.BudgetPeriod", "BudgetPeriod")
                         .WithMany()
                         .HasForeignKey("BudgetPeriodId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BudgetApp.Infrastructure.Models.Category", "Category")
+                    b.HasOne("BudgetApp.Domain.Entities.Category", "Category")
                         .WithMany("Transactions")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BudgetApp.Infrastructure.Models.Payee", "Payee")
+                    b.HasOne("BudgetApp.Domain.Entities.Payee", "Payee")
                         .WithMany()
                         .HasForeignKey("PayeeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -586,12 +586,12 @@ namespace BudgetApp.Api.Migrations
                     b.Navigation("Payee");
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.Budget", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.Budget", b =>
                 {
                     b.Navigation("BudgetPeriods");
                 });
 
-            modelBuilder.Entity("BudgetApp.Infrastructure.Models.Category", b =>
+            modelBuilder.Entity("BudgetApp.Domain.Entities.Category", b =>
                 {
                     b.Navigation("Transactions");
                 });

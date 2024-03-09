@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using BudgetApp.Infrastructure.Models;
+using BudgetApp.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BudgetApp.Api.Controllers.V1
