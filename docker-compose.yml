@@ -16,6 +16,8 @@ services:
       - 'VIRTUAL_PORT=5020'
       - 'ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}'
       - 'CONNECTION_STRING=${CONNECTION_STRING}'
+      - 'ADMIN_USER=${ADMIN_USER:-""}'
+      - 'ADMIN_PASSWORD=${ADMIN_PASSWORD:-""}'
     networks:
       - proxy-net
 
@@ -27,6 +29,8 @@ services:
     restart: unless-stopped
     ports:
       - 3000:3000
+      - 9229:9229
+      - 9230:9230
     environment:
       - 'VIRTUAL_HOST=${HOST}'
       - 'VIRTUAL_PATH=/'
@@ -34,6 +38,8 @@ services:
       - 'VIRTUAL_PORT=3000'
       - 'LETSENCRYPT_HOST=${HOST}'
       - 'LETSENCRYPT_EMAIL=${LE_EMAIL}'
+    extra_hosts:
+      - host.docker.internal:host-gateway
     networks:
       - proxy-net
 

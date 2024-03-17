@@ -6,3 +6,4 @@ node_modules
 # Dotnet CSharp
 obj
 bin
+backend/Application/Features/Accounts/Commands/CreateAccountCommand.cs

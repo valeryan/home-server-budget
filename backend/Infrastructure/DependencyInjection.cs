@@ -1,6 +1,10 @@
-using BudgetApp.Domain.Contracts.Persistence;
-using BudgetApp.Infrastructure.Context;
-using BudgetApp.Infrastructure.Persistence;
+using BudgetApp.Domain.Contracts.Persistence.Repositories;
+using BudgetApp.Domain.Contracts.Services;
+using BudgetApp.Domain.Entities;
+using BudgetApp.Infrastructure.Persistence.Context;
+using BudgetApp.Infrastructure.Persistence.Repositories;
+using BudgetApp.Infrastructure.Persistence.Seeders;
+using BudgetApp.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -27,13 +31,25 @@ namespace BudgetApp.Infrastructure
             });
 
             services.AddRepositories();
+            services.AddServices();
+
+            // Handle seeding Admin User
+            services.AddHostedService<AdminUserSeeder>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddServices(this IServiceCollection services)
+        {
+            services.AddScoped<IPasswordService, PasswordService>();
 
             return services;
         }
 
         public static IServiceCollection AddRepositories(this IServiceCollection services)
         {
-            services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IAsyncRepository<Account>, AccountRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             return services;
         }

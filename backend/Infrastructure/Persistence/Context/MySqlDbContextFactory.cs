@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace BudgetApp.Infrastructure.Context
+namespace BudgetApp.Infrastructure.Persistence.Context
 {
     public class MysqlDbContextFactory : IDesignTimeDbContextFactory<MySqlDbContext>
     {

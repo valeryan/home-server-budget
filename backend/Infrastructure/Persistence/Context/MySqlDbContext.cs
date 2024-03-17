@@ -1,13 +1,10 @@
 using BudgetApp.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace BudgetApp.Infrastructure.Context
+namespace BudgetApp.Infrastructure.Persistence.Context
 {
-    public class MySqlDbContext : DbContext
+    public class MySqlDbContext(DbContextOptions<MySqlDbContext> options) : DbContext(options)
     {
-        public MySqlDbContext(DbContextOptions<MySqlDbContext> options)
-            : base(options) { }
-
         // Define your entities as DbSet properties
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Balance> Balances { get; set; }
@@ -21,8 +18,8 @@ namespace BudgetApp.Infrastructure.Context
         public DbSet<ApplicationData> ExpenseCategories { get; set; }
         public DbSet<ApplicationData> Payees { get; set; }
         public DbSet<ApplicationData> Schedules { get; set; }
-
-        // Add more DbSet properties as needed for other entities
+        public DbSet<User> Users { get; set; }
+        public DbSet<ExternalLogin> ExternalLogins { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -308,6 +305,14 @@ namespace BudgetApp.Infrastructure.Context
 
             // Budget entity - ScheduleParams as JSON
             modelBuilder.Entity<Budget>().Property(b => b.ScheduleParams).HasColumnType("json");
+
+            // User and ExternalLogin
+            modelBuilder
+                .Entity<User>()
+                .HasMany(u => u.ExternalLogins)
+                .WithOne(el => el.User)
+                .HasForeignKey(el => el.UserId)
+                .IsRequired();
 
             base.OnModelCreating(modelBuilder);
         }

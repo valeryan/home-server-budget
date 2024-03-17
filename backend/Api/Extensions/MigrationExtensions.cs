@@ -1,4 +1,4 @@
-﻿using BudgetApp.Infrastructure.Context;
+﻿using BudgetApp.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace BudgetApp.API.Extensions;

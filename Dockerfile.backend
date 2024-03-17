@@ -1,21 +1,28 @@
+# Use SDK image for build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
-WORKDIR /app
+WORKDIR /backend
 
 # Copy everything
 COPY ./backend ./
 
-WORKDIR /app/Api
+WORKDIR /backend/Api
 # Restore as distinct layers
 RUN dotnet restore
 # Build and publish a release
-RUN dotnet publish -c Release -o out
+RUN dotnet publish -c Debug -o out
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 As runtime
-WORKDIR /app
-COPY --from=build-env /app/Api/out ./
+WORKDIR /backend
+COPY --from=build-env /backend/Api/out ./
+
+# Install vsdbg debugger
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends unzip \
+    && curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l /vsdbg
 
 ENV ASPNETCORE_URLS "http://+:5020"
 EXPOSE 5020
 
+# Set the entry point to start the app using the debugger
 ENTRYPOINT ["dotnet", "Api.dll"]

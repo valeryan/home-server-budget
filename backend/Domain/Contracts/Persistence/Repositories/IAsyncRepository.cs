@@ -1,9 +1,9 @@
 
-namespace BudgetApp.Domain.Contracts.Persistence
+namespace BudgetApp.Domain.Contracts.Persistence.Repositories
 {
-    public interface IAsyncRepository<T> where T: class
+    public interface IAsyncRepository<T> where T : class
     {
-        Task<T> GetByIdAsync(int id);
+        Task<T?> GetByIdAsync(int id);
         Task<IReadOnlyList<T>> ListAllAsync();
         Task<T> AddAsync(T entity);
         Task UpdateAsync(T entity);
