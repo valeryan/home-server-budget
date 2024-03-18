@@ -1,7 +1,6 @@
-namespace BudgetApp.Domain.Entities
+namespace BudgetApp.Domain.Entities;
+
+public abstract class Category : ApplicationData
 {
-    public abstract class Category : ApplicationData
-    {
-        public ICollection<Transaction>? Transactions { get; set; }
-    }
+    public ICollection<Transaction>? Transactions { get; set; }
 }

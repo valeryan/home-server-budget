@@ -1,10 +1,9 @@
-namespace BudgetApp.Domain.Entities
+namespace BudgetApp.Domain.Entities;
+
+public class Payee : ApplicationData
 {
-    public class Payee: ApplicationData
+    public Payee()
     {
-        public Payee()
-        {
-            Type = ApplicationDataType.Payee;
-        }
+        Type = ApplicationDataType.Payee;
     }
 }

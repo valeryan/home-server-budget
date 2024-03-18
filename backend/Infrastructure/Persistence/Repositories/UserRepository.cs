@@ -16,9 +16,10 @@ namespace BudgetApp.Infrastructure.Persistence.Repositories
             return entity;
         }
 
-        public Task DeleteAsync(User entity)
+        public async Task DeleteAsync(User entity)
         {
-            throw new NotImplementedException();
+            _dbContext.Users.Remove(entity);
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<bool> ExistsAsync(string username)
@@ -26,19 +27,27 @@ namespace BudgetApp.Infrastructure.Persistence.Repositories
             return await _dbContext.Users.AnyAsync(user => user.Username == username);
         }
 
-        public Task<User?> GetByIdAsync(int id)
+        public async Task<User?> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Users
+                .FirstOrDefaultAsync(user => user.Id == id);
         }
 
-        public Task<IReadOnlyList<User>> ListAllAsync()
+        public async Task<User?> GetByUsernameAsync(string username)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Users
+                .FirstOrDefaultAsync(user => user.Username == username);
         }
 
-        public Task UpdateAsync(User entity)
+        public async Task<IReadOnlyList<User>> ListAllAsync()
         {
-            throw new NotImplementedException();
+            return await _dbContext.Users.ToListAsync();
+        }
+
+        public async Task UpdateAsync(User entity)
+        {
+            _dbContext.Users.Update(entity);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

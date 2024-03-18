@@ -1,10 +1,9 @@
-namespace BudgetApp.Domain.Entities
+namespace BudgetApp.Domain.Entities;
+
+public class IncomeCategory : Category
 {
-    public class IncomeCategory : Category
+    public IncomeCategory()
     {
-        public IncomeCategory()
-        {
-            Type = ApplicationDataType.IncomeCategory;
-        }
+        Type = ApplicationDataType.IncomeCategory;
     }
 }

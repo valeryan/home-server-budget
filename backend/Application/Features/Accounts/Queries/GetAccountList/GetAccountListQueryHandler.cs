@@ -3,17 +3,22 @@ using BudgetApp.Domain.Contracts.Persistence.Repositories;
 using BudgetApp.Domain.Entities;
 using MediatR;
 
-namespace BudgetApp.Application.Features.Accounts.Queries.GetAccountList
+namespace BudgetApp.Application.Features.Accounts.Queries.GetAccountList;
+
+public class GetAccountListQueryHandler(IAsyncRepository<Account> accountRepository)
+    : IRequestHandler<GetAccountListQuery, List<AccountDto>>
 {
-    public class GetAccountListQueryHandler(IAsyncRepository<Account> accountRepository) : IRequestHandler<GetAccountListQuery, List<AccountDto>>
+    private readonly IAsyncRepository<Account> _accountRepository = accountRepository;
+
+    public async Task<List<AccountDto>> Handle(
+        GetAccountListQuery request,
+        CancellationToken cancellationToken
+    )
     {
-        private readonly IAsyncRepository<Account> _accountRepository = accountRepository;
+        var Accounts = await _accountRepository.ListAllAsync();
 
-        public async Task<List<AccountDto>> Handle(GetAccountListQuery request, CancellationToken cancellationToken)
-        {
-            var Accounts = await _accountRepository.ListAllAsync();
-
-            return Accounts.Select(account => new AccountDto
+        return Accounts
+            .Select(account => new AccountDto
             {
                 Id = account.Id,
                 Name = account.Name,
@@ -25,7 +30,7 @@ namespace BudgetApp.Application.Features.Accounts.Queries.GetAccountList
                     CurrentBalance = account.Balance.CurrentBalance,
                     InterestRate = account.Balance.InterestRate,
                 }
-            }).ToList();
-        }
+            })
+            .ToList();
     }
 }

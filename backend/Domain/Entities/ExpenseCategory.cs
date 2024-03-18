@@ -1,10 +1,9 @@
-namespace BudgetApp.Domain.Entities
+namespace BudgetApp.Domain.Entities;
+
+public class ExpenseCategory : Category
 {
-    public class ExpenseCategory : Category
+    public ExpenseCategory()
     {
-        public ExpenseCategory()
-        {
-            Type = ApplicationDataType.ExpenseCategory;
-        }
+        Type = ApplicationDataType.ExpenseCategory;
     }
 }

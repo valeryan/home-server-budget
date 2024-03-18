@@ -1,10 +1,9 @@
-namespace BudgetApp.Domain.Entities
+namespace BudgetApp.Domain.Entities;
+
+public abstract class ApplicationData
 {
-    public abstract class ApplicationData
-    {
-        public int Id { get; set; }
-        public required string Name { get; set; }
-        public string? Description { get; set; }
-        public virtual ApplicationDataType Type { get; set; }
-    }
+    public int Id { get; set; }
+    public required string Name { get; set; }
+    public string? Description { get; set; }
+    public virtual ApplicationDataType Type { get; set; }
 }

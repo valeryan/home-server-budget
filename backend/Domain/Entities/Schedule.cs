@@ -1,10 +1,9 @@
-namespace BudgetApp.Domain.Entities
+namespace BudgetApp.Domain.Entities;
+
+public class Schedule : ApplicationData
 {
-    public class Schedule: ApplicationData
+    public Schedule()
     {
-        public Schedule()
-        {
-            Type = ApplicationDataType.Schedule;
-        }
+        Type = ApplicationDataType.Schedule;
     }
 }

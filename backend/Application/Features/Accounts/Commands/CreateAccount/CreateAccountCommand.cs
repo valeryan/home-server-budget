@@ -1,10 +1,9 @@
 using BudgetApp.Application.DTOs;
 using MediatR;
 
-namespace BudgetApp.Application.Features.Accounts.Commands.CreateAccount
+namespace BudgetApp.Application.Features.Accounts.Commands.CreateAccount;
+
+public class CreateAccountCommand : IRequest<AccountDto>
 {
-    public class CreateAccountCommand : IRequest<AccountDto>
-    {
-        public required AccountDto Account { get; set; }
-    }
+    public required AccountDto Account { get; set; }
 }
