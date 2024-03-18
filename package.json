@@ -4,21 +4,27 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm run watch-app\" \"npm run watch-api\"",
-    "watch-app": "nodemon --watch app/src --exec 'docker compose up --build --detach budget-app'",
-    "watch-api": "nodemon --watch api --exec 'docker compose up --build --detach budget-api'"
+    "watch-app": "nodemon --watch app/src --exec 'docker compose up --build --detach budget-frontend'",
+    "watch-api": "nodemon --watch api --exec 'docker compose up --build --detach budget-backend'"
   },
   "nodemonConfig": {
     "watch": [
       "app/src",
       "api"
     ],
-    "ext": "js,jsx,ts,tsx,cs",
+    "ext": "js,jsx,ts,tsx,cs,csproj",
     "execMap": {
       "js": "node --harmony"
     }
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
+    "cz-conventional-changelog": "^3.3.0",
     "nodemon": "^3.0.3"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

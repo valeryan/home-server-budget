@@ -1,11 +1,11 @@
 version: '3.9'
 
 services:
-  budget-api:
+  budget-backend:
     build:
       context: .
-      dockerfile: Dockerfile.api
-    container_name: budget-api
+      dockerfile: Dockerfile.backend
+    container_name: budget-backend
     restart: unless-stopped
     ports:
       - 5020:5020
@@ -15,17 +15,22 @@ services:
       - 'VIRTUAL_NETWORK=${PROXY_HOST}'
       - 'VIRTUAL_PORT=5020'
       - 'ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}'
+      - 'CONNECTION_STRING=${CONNECTION_STRING}'
+      - 'ADMIN_USER=${ADMIN_USER:-""}'
+      - 'ADMIN_PASSWORD=${ADMIN_PASSWORD:-""}'
     networks:
       - proxy-net
 
-  budget-app:
+  budget-frontend:
     build:
       context: .
-      dockerfile: Dockerfile.app
-    container_name: budget-app
+      dockerfile: Dockerfile.frontend
+    container_name: budget-frontend
     restart: unless-stopped
     ports:
       - 3000:3000
+      - 9229:9229
+      - 9230:9230
     environment:
       - 'VIRTUAL_HOST=${HOST}'
       - 'VIRTUAL_PATH=/'
@@ -33,6 +38,8 @@ services:
       - 'VIRTUAL_PORT=3000'
       - 'LETSENCRYPT_HOST=${HOST}'
       - 'LETSENCRYPT_EMAIL=${LE_EMAIL}'
+    extra_hosts:
+      - host.docker.internal:host-gateway
     networks:
       - proxy-net
 
