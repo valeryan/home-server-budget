@@ -27,8 +27,13 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     components: {
-      // Add custom dashboard component
-      afterDashboard: ['@/components/Dashboard#default'],
+      // Replace default dashboard
+      views: {
+        dashboard: {
+          Component: '@/components/Dashboard#default',
+        },
+      },
+      beforeNavLinks: ['/components/DashboardNavLink#DashboardNavLink'],
     },
   },
   collections: [

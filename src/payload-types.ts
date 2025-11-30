@@ -136,6 +136,10 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: string;
+  /**
+   * The default account to show on your dashboard
+   */
+  defaultAccount?: (string | null) | Account;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -153,64 +157,6 @@ export interface User {
       }[]
     | null;
   password?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: string;
-  alt: string;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-}
-/**
- * ✅ Auto-seeded • Income categories (edit or add more as needed)
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "income-categories".
- */
-export interface IncomeCategory {
-  id: string;
-  name: string;
-  description?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * ✅ Auto-seeded • Expense categories (edit or add more as needed)
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "expense-categories".
- */
-export interface ExpenseCategory {
-  id: string;
-  name: string;
-  description?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * 📋 Step 1: Add payees (employers, landlords, stores, etc.)
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "payees".
- */
-export interface Payee {
-  id: string;
-  name: string;
-  description?: string | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * 📋 Step 2: Add your bank accounts (checking, savings, credit cards)
@@ -298,6 +244,64 @@ export interface Account {
    * Which month does this occur?
    */
   month?: ('1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: string;
+  alt: string;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * ✅ Auto-seeded • Income categories (edit or add more as needed)
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "income-categories".
+ */
+export interface IncomeCategory {
+  id: string;
+  name: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * ✅ Auto-seeded • Expense categories (edit or add more as needed)
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "expense-categories".
+ */
+export interface ExpenseCategory {
+  id: string;
+  name: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * 📋 Step 1: Add payees (employers, landlords, stores, etc.)
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payees".
+ */
+export interface Payee {
+  id: string;
+  name: string;
+  description?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -615,6 +619,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  defaultAccount?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
