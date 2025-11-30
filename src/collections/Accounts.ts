@@ -9,8 +9,8 @@ export const Accounts: CollectionConfig = {
   slug: 'accounts',
   admin: {
     useAsTitle: 'name',
-    description: '📋 Step 2: Add your bank accounts (checking, savings, credit cards)',
-    group: '⚙️ Setup',
+    description: 'Bank accounts, credit cards, and cash accounts',
+    group: '⚙️ System',
   },
   access: {
     read: () => true,

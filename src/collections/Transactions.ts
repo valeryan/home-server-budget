@@ -4,9 +4,9 @@ export const Transactions: CollectionConfig = {
   slug: 'transactions',
   admin: {
     useAsTitle: 'description',
-    defaultColumns: ['date', 'type', 'amount', 'account', 'budget'],
-    description: 'Historical record of all financial transactions (optional)',
-    group: '💰 Budgets',
+    defaultColumns: ['date', 'type', 'amount', 'account'],
+    description: 'Record of all financial transactions',
+    group: '💰 Budgeting',
   },
   access: {
     read: () => true,
@@ -20,6 +20,15 @@ export const Transactions: CollectionConfig = {
         date: {
           pickerAppearance: 'dayAndTime',
         },
+      },
+    },
+    {
+      name: 'account',
+      type: 'relationship',
+      relationTo: 'accounts',
+      required: true,
+      admin: {
+        description: 'Which account this transaction affects',
       },
     },
     {
@@ -47,15 +56,6 @@ export const Transactions: CollectionConfig = {
         },
       },
     },
-    {
-      name: 'budget',
-      type: 'relationship',
-      relationTo: 'budgets',
-      required: true,
-      admin: {
-        description: 'Which budget this transaction belongs to',
-      },
-    },
     // Fields for income transactions
     {
       name: 'incomeDetails',
@@ -73,11 +73,6 @@ export const Transactions: CollectionConfig = {
           name: 'payee',
           type: 'relationship',
           relationTo: 'payees',
-        },
-        {
-          name: 'account',
-          type: 'relationship',
-          relationTo: 'accounts',
         },
       ],
     },
@@ -99,11 +94,6 @@ export const Transactions: CollectionConfig = {
           type: 'relationship',
           relationTo: 'payees',
         },
-        {
-          name: 'account',
-          type: 'relationship',
-          relationTo: 'accounts',
-        },
       ],
     },
     // Fields for transfer transactions
@@ -115,14 +105,12 @@ export const Transactions: CollectionConfig = {
       },
       fields: [
         {
-          name: 'fromAccount',
-          type: 'relationship',
-          relationTo: 'accounts',
-        },
-        {
           name: 'toAccount',
           type: 'relationship',
           relationTo: 'accounts',
+          admin: {
+            description: 'The account receiving the transfer',
+          },
         },
       ],
     },

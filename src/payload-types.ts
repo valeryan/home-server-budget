@@ -73,9 +73,9 @@ export interface Config {
     'expense-categories': ExpenseCategory;
     payees: Payee;
     accounts: Account;
+    transactions: Transaction;
     'recurring-items': RecurringItem;
     budgets: Budget;
-    transactions: Transaction;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -89,9 +89,9 @@ export interface Config {
     'expense-categories': ExpenseCategoriesSelect<false> | ExpenseCategoriesSelect<true>;
     payees: PayeesSelect<false> | PayeesSelect<true>;
     accounts: AccountsSelect<false> | AccountsSelect<true>;
+    transactions: TransactionsSelect<false> | TransactionsSelect<true>;
     'recurring-items': RecurringItemsSelect<false> | RecurringItemsSelect<true>;
     budgets: BudgetsSelect<false> | BudgetsSelect<true>;
-    transactions: TransactionsSelect<false> | TransactionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -159,7 +159,7 @@ export interface User {
   password?: string | null;
 }
 /**
- * 📋 Step 2: Add your bank accounts (checking, savings, credit cards)
+ * Bank accounts, credit cards, and cash accounts
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "accounts".
@@ -293,7 +293,7 @@ export interface ExpenseCategory {
   createdAt: string;
 }
 /**
- * 📋 Step 1: Add payees (employers, landlords, stores, etc.)
+ * People and companies you transact with
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payees".
@@ -306,7 +306,45 @@ export interface Payee {
   createdAt: string;
 }
 /**
- * 📋 Step 3: Define your recurring income, expenses, and transfers
+ * Record of all financial transactions
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions".
+ */
+export interface Transaction {
+  id: string;
+  date: string;
+  /**
+   * Which account this transaction affects
+   */
+  account: string | Account;
+  type: 'income' | 'expense' | 'transfer';
+  description: string;
+  amount: number;
+  incomeDetails?: {
+    category?: (string | null) | IncomeCategory;
+    payee?: (string | null) | Payee;
+  };
+  expenseDetails?: {
+    category?: (string | null) | ExpenseCategory;
+    payee?: (string | null) | Payee;
+  };
+  transferDetails?: {
+    /**
+     * The account receiving the transfer
+     */
+    toAccount?: (string | null) | Account;
+  };
+  notes?: string | null;
+  /**
+   * Has this transaction been reconciled with your bank statement?
+   */
+  reconciled?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Recurring income, expenses, and transfers
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "recurring-items".
@@ -426,7 +464,7 @@ export interface RecurringItem {
   createdAt: string;
 }
 /**
- * 📅 Step 4: Create budget periods - containers for a slice of time (e.g., paycheck to paycheck)
+ * Time-based budget periods (paycheck to paycheck)
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "budgets".
@@ -471,44 +509,6 @@ export interface Budget {
     };
     [k: string]: unknown;
   } | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Historical record of all financial transactions (optional)
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "transactions".
- */
-export interface Transaction {
-  id: string;
-  date: string;
-  type: 'income' | 'expense' | 'transfer';
-  description: string;
-  amount: number;
-  /**
-   * Which budget this transaction belongs to
-   */
-  budget: string | Budget;
-  incomeDetails?: {
-    category?: (string | null) | IncomeCategory;
-    payee?: (string | null) | Payee;
-    account?: (string | null) | Account;
-  };
-  expenseDetails?: {
-    category?: (string | null) | ExpenseCategory;
-    payee?: (string | null) | Payee;
-    account?: (string | null) | Account;
-  };
-  transferDetails?: {
-    fromAccount?: (string | null) | Account;
-    toAccount?: (string | null) | Account;
-  };
-  notes?: string | null;
-  /**
-   * Has this transaction been reconciled with your bank statement?
-   */
-  reconciled?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -561,16 +561,16 @@ export interface PayloadLockedDocument {
         value: string | Account;
       } | null)
     | ({
+        relationTo: 'transactions';
+        value: string | Transaction;
+      } | null)
+    | ({
         relationTo: 'recurring-items';
         value: string | RecurringItem;
       } | null)
     | ({
         relationTo: 'budgets';
         value: string | Budget;
-      } | null)
-    | ({
-        relationTo: 'transactions';
-        value: string | Transaction;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -707,6 +707,38 @@ export interface AccountsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions_select".
+ */
+export interface TransactionsSelect<T extends boolean = true> {
+  date?: T;
+  account?: T;
+  type?: T;
+  description?: T;
+  amount?: T;
+  incomeDetails?:
+    | T
+    | {
+        category?: T;
+        payee?: T;
+      };
+  expenseDetails?:
+    | T
+    | {
+        category?: T;
+        payee?: T;
+      };
+  transferDetails?:
+    | T
+    | {
+        toAccount?: T;
+      };
+  notes?: T;
+  reconciled?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "recurring-items_select".
  */
 export interface RecurringItemsSelect<T extends boolean = true> {
@@ -748,41 +780,6 @@ export interface BudgetsSelect<T extends boolean = true> {
   endDate?: T;
   status?: T;
   notes?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "transactions_select".
- */
-export interface TransactionsSelect<T extends boolean = true> {
-  date?: T;
-  type?: T;
-  description?: T;
-  amount?: T;
-  budget?: T;
-  incomeDetails?:
-    | T
-    | {
-        category?: T;
-        payee?: T;
-        account?: T;
-      };
-  expenseDetails?:
-    | T
-    | {
-        category?: T;
-        payee?: T;
-        account?: T;
-      };
-  transferDetails?:
-    | T
-    | {
-        fromAccount?: T;
-        toAccount?: T;
-      };
-  notes?: T;
-  reconciled?: T;
   updatedAt?: T;
   createdAt?: T;
 }

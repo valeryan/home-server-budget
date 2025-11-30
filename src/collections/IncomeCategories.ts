@@ -5,7 +5,7 @@ export const IncomeCategories: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     description: '✅ Auto-seeded • Income categories (edit or add more as needed)',
-    group: '⚙️ Setup',
+    group: '⚙️ System',
   },
   access: {
     read: () => true,

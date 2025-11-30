@@ -9,8 +9,9 @@ export const RecurringItems: CollectionConfig = {
   slug: 'recurring-items',
   admin: {
     useAsTitle: 'name',
-    description: '📋 Step 3: Define your recurring income, expenses, and transfers',
-    group: '🔄 Recurring Items',
+    description: 'Recurring income, expenses, and transfers',
+    group: '⚙️ System',
+
     defaultColumns: ['name', 'itemType', 'category', 'amount', 'account', 'scheduleType'],
     listSearchableFields: ['name'],
   },

@@ -39,16 +39,13 @@ export default buildConfig({
   collections: [
     Users,
     Media,
-    // Setup - Do these first (in order)
     IncomeCategories,
     ExpenseCategories,
     Payees,
     Accounts,
-    // Recurring Items - Define recurring income/expenses/transfers
-    RecurringItems,
-    // Budgets - Create budgets for each paycheck
-    Budgets,
     Transactions,
+    RecurringItems,
+    Budgets,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

@@ -6,9 +6,8 @@ export const Budgets: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'account', 'startDate', 'endDate', 'status'],
-    description:
-      '📅 Step 4: Create budget periods - containers for a slice of time (e.g., paycheck to paycheck)',
-    group: '💰 Budget Periods',
+    description: 'Time-based budget periods (paycheck to paycheck)',
+    group: '💰 Budgeting',
   },
   access: {
     read: () => true,

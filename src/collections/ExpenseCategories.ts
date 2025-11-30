@@ -5,7 +5,7 @@ export const ExpenseCategories: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     description: '✅ Auto-seeded • Expense categories (edit or add more as needed)',
-    group: '⚙️ Setup',
+    group: '⚙️ System',
   },
   access: {
     read: () => true,
