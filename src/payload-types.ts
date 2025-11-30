@@ -421,7 +421,7 @@ export interface RecurringItem {
   createdAt: string;
 }
 /**
- * Create a new budget for each paycheck cycle. Set up Templates first!
+ * 📅 Step 4: Create budget periods - containers for a slice of time (e.g., paycheck to paycheck)
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "budgets".
@@ -432,87 +432,25 @@ export interface Budget {
    * E.g., "December 15th Paycheck" or "Budget 2024-01-15"
    */
   name: string;
+  /**
+   * The account this budget period manages
+   */
+  account: string | Account;
+  /**
+   * Start of this budget period
+   */
   startDate: string;
+  /**
+   * End of this budget period
+   */
   endDate: string;
-  status: 'active' | 'completed' | 'archived';
   /**
-   * Income for this budget period
+   * Planning = setting up, Active = current period, Closed = completed/archived
    */
-  income?:
-    | {
-        /**
-         * The recurring item this was created from (if any)
-         */
-        recurringItem?: (string | null) | RecurringItem;
-        name: string;
-        amount: number;
-        /**
-         * Actual amount received (if different from planned)
-         */
-        actualAmount?: number | null;
-        category: string | IncomeCategory;
-        payee: string | Payee;
-        account: string | Account;
-        date?: string | null;
-        received?: boolean | null;
-        notes?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  status: 'planning' | 'active' | 'closed';
   /**
-   * Expenses for this budget period
+   * Notes about this budget period (goals, special circumstances, etc.)
    */
-  expenses?:
-    | {
-        /**
-         * The recurring item this was created from (if any)
-         */
-        recurringItem?: (string | null) | RecurringItem;
-        name: string;
-        amount: number;
-        /**
-         * Actual amount paid (if different from planned)
-         */
-        actualAmount?: number | null;
-        category: string | ExpenseCategory;
-        payee: string | Payee;
-        account: string | Account;
-        dueDate?: string | null;
-        paid?: boolean | null;
-        notes?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Transfers between accounts for this budget period
-   */
-  transfers?:
-    | {
-        /**
-         * The recurring item this was created from (if any)
-         */
-        recurringItem?: (string | null) | RecurringItem;
-        name: string;
-        amount: number;
-        fromAccount: string | Account;
-        toAccount: string | Account;
-        date?: string | null;
-        completed?: boolean | null;
-        notes?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Calculated totals (can be computed on save or via hook)
-   */
-  summary?: {
-    totalIncome?: number | null;
-    totalExpenses?: number | null;
-    /**
-     * Total Income - Total Expenses
-     */
-    netIncome?: number | null;
-  };
   notes?: {
     root: {
       type: string;
@@ -798,59 +736,10 @@ export interface RecurringItemsSelect<T extends boolean = true> {
  */
 export interface BudgetsSelect<T extends boolean = true> {
   name?: T;
+  account?: T;
   startDate?: T;
   endDate?: T;
   status?: T;
-  income?:
-    | T
-    | {
-        recurringItem?: T;
-        name?: T;
-        amount?: T;
-        actualAmount?: T;
-        category?: T;
-        payee?: T;
-        account?: T;
-        date?: T;
-        received?: T;
-        notes?: T;
-        id?: T;
-      };
-  expenses?:
-    | T
-    | {
-        recurringItem?: T;
-        name?: T;
-        amount?: T;
-        actualAmount?: T;
-        category?: T;
-        payee?: T;
-        account?: T;
-        dueDate?: T;
-        paid?: T;
-        notes?: T;
-        id?: T;
-      };
-  transfers?:
-    | T
-    | {
-        recurringItem?: T;
-        name?: T;
-        amount?: T;
-        fromAccount?: T;
-        toAccount?: T;
-        date?: T;
-        completed?: T;
-        notes?: T;
-        id?: T;
-      };
-  summary?:
-    | T
-    | {
-        totalIncome?: T;
-        totalExpenses?: T;
-        netIncome?: T;
-      };
   notes?: T;
   updatedAt?: T;
   createdAt?: T;

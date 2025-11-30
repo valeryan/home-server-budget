@@ -47,17 +47,15 @@ export const DAYS_OF_MONTH_OPTIONS = [
 
 // Type guard to access schedule data safely
 interface ItemWithScheduleData {
-  scheduleData?: {
-    dayOfWeek?: string
-    anchorDate?: string
-    dayOfMonth?: string | number
-    month?: string
-  }
+  dayOfWeek?: string
+  anchorDate?: string
+  dayOfMonth?: string | number
+  month?: string
 }
 
-// Helper to get schedule data
+// Helper to get schedule data (fields are now at root level, not in scheduleData group)
 function getScheduleData(item: ItemWithScheduleData) {
-  return item.scheduleData
+  return item
 }
 
 export const SCHEDULES: Record<string, ScheduleDefinition> = {

@@ -1,6 +1,7 @@
 import { CompoundingScheduleLabel as CompoundingScheduleLabel_5ce8fc006f959fd3fbc3c34af18027c3 } from '../../../components/FieldsetLabel'
 import { ScheduleDetailsLabel as ScheduleDetailsLabel_5ce8fc006f959fd3fbc3c34af18027c3 } from '../../../components/FieldsetLabel'
 import { RecurringScheduleLabel as RecurringScheduleLabel_5ce8fc006f959fd3fbc3c34af18027c3 } from '../../../components/FieldsetLabel'
+import { BudgetProjections as BudgetProjections_a36a55bcc9743e4d7aa6d1493c00010c } from '../../../components/BudgetProjections'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -30,6 +31,7 @@ export const importMap = {
   "/components/FieldsetLabel#CompoundingScheduleLabel": CompoundingScheduleLabel_5ce8fc006f959fd3fbc3c34af18027c3,
   "/components/FieldsetLabel#ScheduleDetailsLabel": ScheduleDetailsLabel_5ce8fc006f959fd3fbc3c34af18027c3,
   "/components/FieldsetLabel#RecurringScheduleLabel": RecurringScheduleLabel_5ce8fc006f959fd3fbc3c34af18027c3,
+  "/components/BudgetProjections#BudgetProjections": BudgetProjections_a36a55bcc9743e4d7aa6d1493c00010c,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
