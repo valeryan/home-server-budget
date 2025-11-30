@@ -309,6 +309,7 @@ export interface Account {
  */
 export interface RecurringItem {
   id: string;
+  category?: string | null;
   /**
    * What type of recurring item is this?
    */
@@ -704,6 +705,7 @@ export interface AccountsSelect<T extends boolean = true> {
  * via the `definition` "recurring-items_select".
  */
 export interface RecurringItemsSelect<T extends boolean = true> {
+  category?: T;
   itemType?: T;
   name?: T;
   amount?: T;

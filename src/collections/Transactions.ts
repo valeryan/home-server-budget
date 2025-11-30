@@ -41,6 +41,11 @@ export const Transactions: CollectionConfig = {
       name: 'amount',
       type: 'number',
       required: true,
+      admin: {
+        components: {
+          Cell: '/components/CurrencyCell#CurrencyCell',
+        },
+      },
     },
     {
       name: 'budget',

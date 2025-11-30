@@ -1,5 +1,7 @@
+import { CurrencyCell as CurrencyCell_ef9297f0eb6a2cfced1e545a414cb8b0 } from '../../../components/CurrencyCell'
 import { CompoundingScheduleLabel as CompoundingScheduleLabel_5ce8fc006f959fd3fbc3c34af18027c3 } from '../../../components/FieldsetLabel'
 import { ScheduleDetailsLabel as ScheduleDetailsLabel_5ce8fc006f959fd3fbc3c34af18027c3 } from '../../../components/FieldsetLabel'
+import { RecurringItemCategoryCell as RecurringItemCategoryCell_8b343fe02047fa445ba0228d74b1d2f6 } from '../../../components/RecurringItemCategoryCell'
 import { RecurringScheduleLabel as RecurringScheduleLabel_5ce8fc006f959fd3fbc3c34af18027c3 } from '../../../components/FieldsetLabel'
 import { BudgetProjections as BudgetProjections_a36a55bcc9743e4d7aa6d1493c00010c } from '../../../components/BudgetProjections'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -28,8 +30,10 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { default as default_b39f2d96c5778d5698b3c9e7777aa63a } from '@/components/Dashboard'
 
 export const importMap = {
+  "/components/CurrencyCell#CurrencyCell": CurrencyCell_ef9297f0eb6a2cfced1e545a414cb8b0,
   "/components/FieldsetLabel#CompoundingScheduleLabel": CompoundingScheduleLabel_5ce8fc006f959fd3fbc3c34af18027c3,
   "/components/FieldsetLabel#ScheduleDetailsLabel": ScheduleDetailsLabel_5ce8fc006f959fd3fbc3c34af18027c3,
+  "/components/RecurringItemCategoryCell#RecurringItemCategoryCell": RecurringItemCategoryCell_8b343fe02047fa445ba0228d74b1d2f6,
   "/components/FieldsetLabel#RecurringScheduleLabel": RecurringScheduleLabel_5ce8fc006f959fd3fbc3c34af18027c3,
   "/components/BudgetProjections#BudgetProjections": BudgetProjections_a36a55bcc9743e4d7aa6d1493c00010c,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,

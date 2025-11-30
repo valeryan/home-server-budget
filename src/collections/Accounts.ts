@@ -45,6 +45,9 @@ export const Accounts: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'The initial balance of this account',
+        components: {
+          Cell: '/components/CurrencyCell#CurrencyCell',
+        },
       },
     },
     {
@@ -54,6 +57,9 @@ export const Accounts: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'The current balance (updated automatically by transactions)',
+        components: {
+          Cell: '/components/CurrencyCell#CurrencyCell',
+        },
       },
     },
     {

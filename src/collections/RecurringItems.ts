@@ -11,11 +11,23 @@ export const RecurringItems: CollectionConfig = {
     useAsTitle: 'name',
     description: '📋 Step 3: Define your recurring income, expenses, and transfers',
     group: '🔄 Recurring Items',
+    defaultColumns: ['name', 'itemType', 'category', 'amount', 'account', 'scheduleType'],
+    listSearchableFields: ['name'],
   },
   access: {
     read: () => true,
   },
   fields: [
+    {
+      name: 'category',
+      type: 'text',
+      admin: {
+        hidden: true,
+        components: {
+          Cell: '/components/RecurringItemCategoryCell#RecurringItemCategoryCell',
+        },
+      },
+    },
     {
       name: 'itemType',
       type: 'select',
@@ -39,6 +51,11 @@ export const RecurringItems: CollectionConfig = {
       type: 'number',
       required: true,
       min: 0,
+      admin: {
+        components: {
+          Cell: '/components/CurrencyCell#CurrencyCell',
+        },
+      },
     },
     // Income-specific fields
     {
