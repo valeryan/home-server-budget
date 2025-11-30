@@ -1,24 +1,36 @@
-version: '3'
-
 services:
   payload:
     image: node:18-alpine
-    ports:
-      - '3000:3000'
+    container_name: budget-payload
+    restart: unless-stopped
+    working_dir: /home/node/app/
     volumes:
       - .:/home/node/app
       - node_modules:/home/node/app/node_modules
-    working_dir: /home/node/app/
     command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm dev"
     depends_on:
       - mongo
-      # - postgres
     env_file:
       - .env
+    environment:
+      # --- nginx-proxy / letsencrypt wiring ---
+      - VIRTUAL_HOST=${HOST}            # e.g. budget.samuelhilson.com
+      - VIRTUAL_PATH=/                  # serve Payload at root
+      - VIRTUAL_NETWORK=${PROXY_HOST}   # e.g. home-server_proxy-tier
+      - VIRTUAL_PORT=3000
+      - LETSENCRYPT_HOST=${HOST}
+      - LETSENCRYPT_EMAIL=${LE_EMAIL}
+      - SERVER_URL=https://${HOST}
+      # Tell Next.js it's behind a proxy
+      - HOSTNAME=0.0.0.0
+    networks:
+      - proxy-net
 
   # Ensure your DATABASE_URI uses 'mongo' as the hostname ie. mongodb://mongo/my-db-name
   mongo:
     image: mongo:latest
+    container_name: budget-mongo
+    restart: unless-stopped
     ports:
       - '27017:27017'
     command:
@@ -27,17 +39,14 @@ services:
       - data:/data/db
     logging:
       driver: none
-
-  # Uncomment the following to use postgres
-  # postgres:
-  #   restart: always
-  #   image: postgres:latest
-  #   volumes:
-  #     - pgdata:/var/lib/postgresql/data
-  #   ports:
-  #     - "5432:5432"
+    networks:
+      - proxy-net
 
 volumes:
   data:
-  # pgdata:
   node_modules:
+
+networks:
+  proxy-net:
+    name: home-server_proxy-tier
+    external: true

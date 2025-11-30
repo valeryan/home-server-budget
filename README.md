@@ -1,12 +1,48 @@
-# Payload Blank Template
+# Home Budget Management System
 
-This template comes configured with the bare minimum to get started on anything you need.
+A Payload CMS-based budget management application designed to replace spreadsheet-based budgeting with a proper backend system.
 
-## Quick start
+## Overview
 
-This template can be deployed directly from our Cloud hosting and it will setup MongoDB and cloud S3 object storage for media.
+This application helps you manage your home budget by creating budget periods that align with your paycheck schedule. It features:
 
-## Quick Start - local setup
+- **Template-based budgeting**: Define recurring income, expenses, and transfers once
+- **Period-based tracking**: Create a new budget for each paycheck cycle
+- **Multiple accounts**: Track checking, savings, credit cards, etc.
+- **Planned vs Actual**: Compare budgeted amounts with actual spending
+- **MongoDB-optimized**: Document-oriented design for efficient queries
+
+## Documentation
+
+- **[GETTING_STARTED.md](./GETTING_STARTED.md)** - Quick start guide and next steps
+- **[BUDGET_MODEL.md](./BUDGET_MODEL.md)** - Detailed data model documentation
+- **[src/seed-data.ts](./src/seed-data.ts)** - Initial data to populate your system
+- **[src/hooks/budgetPeriodHooks.example.ts](./src/hooks/budgetPeriodHooks.example.ts)** - Example automation hooks
+
+## Collections Overview
+
+The application includes the following collections:
+
+### Configuration Collections
+- **Schedules**: Recurring schedule types (weekly, bi-weekly, monthly, etc.)
+- **Income Categories**: Categories for income items (Regular Pay, Bonus, etc.)
+- **Expense Categories**: Categories for expenses (Food, Utilities, Housing, etc.)
+- **Payees**: People and companies you receive money from or pay to
+- **Accounts**: Your financial accounts (checking, savings, credit cards, etc.)
+
+### Template Collections
+- **Income Templates**: Recurring income items (salary, side income, etc.)
+- **Expense Templates**: Recurring expenses (rent, utilities, subscriptions, etc.)
+- **Transfer Templates**: Recurring transfers between accounts
+
+### Budget Management
+- **Budget Periods**: Individual budget cycles (one per paycheck)
+  - Embeds income, expense, and transfer items
+  - Tracks planned vs actual amounts
+  - Calculates summary totals
+- **Transactions**: Optional historical record of all financial movements
+
+## Quick Start - Local Setup
 
 To spin up this template locally, follow these steps:
 
@@ -16,13 +52,16 @@ After you click the `Deploy` button above, you'll want to have standalone copy o
 
 ### Development
 
-1. First [clone the repo](#clone) if you have not done so already
-2. `cd my-project && cp .env.example .env` to copy the example environment variables. You'll need to add the `MONGODB_URI` from your Cloud project to your `.env` if you want to use S3 storage and the MongoDB database that was created for you.
+1. First clone the repo if you have not done so already
+2. `cp .env.example .env` to copy the example environment variables
+3. Add your MongoDB connection string to `MONGODB_URI` in `.env`
+4. Add a secure secret to `PAYLOAD_SECRET` in `.env`
+5. `pnpm install && pnpm dev` to install dependencies and start the dev server
+6. Open `http://localhost:3000/admin` to access the admin panel
+7. Create your first admin user
+8. Follow the [GETTING_STARTED.md](./GETTING_STARTED.md) guide to set up your budget
 
-3. `pnpm install && pnpm dev` to install dependencies and start the dev server
-4. open `http://localhost:3000` to open the app in your browser
-
-That's it! Changes made in `./src` will be reflected in your app. Follow the on-screen instructions to login and create your first admin user. Then check out [Production](#production) once you're ready to build and serve your app, and [Deployment](#deployment) when you're ready to go live.
+That's it! Changes made in `./src` will be reflected in your app.
 
 #### Docker (Optional)
 
@@ -34,23 +73,53 @@ To do so, follow these steps:
 - Modify the `docker-compose.yml` file's `MONGODB_URI` to match the above `<dbname>`
 - Run `docker-compose up` to start the database, optionally pass `-d` to run in the background.
 
-## How it works
+## How It Works
 
-The Payload config is tailored specifically to the needs of most websites. It is pre-configured in the following ways:
+This budget system is designed around a template-based workflow:
+
+1. **Set up your configuration**: Add schedules, categories, payees, and accounts
+2. **Create templates**: Define your recurring income, expenses, and transfers
+3. **Create budget periods**: For each paycheck, create a new budget period
+4. **Track actuals**: Mark items as received/paid and update actual amounts
+5. **Monitor progress**: View summaries and track budget vs actual spending
+
+### Key Design Principles
+
+- **Document-oriented**: Budget periods are self-contained MongoDB documents
+- **Template-based**: Recurring items are defined once and copied to each period
+- **Flexible**: Easy to add one-time items or adjust amounts per period
+- **Historical**: Past budget periods preserve data even if templates change
 
 ### Collections
 
+### Authentication & Media
+
 See the [Collections](https://payloadcms.com/docs/configuration/collections) docs for details on how to extend this functionality.
 
-- #### Users (Authentication)
+- **Users**: Auth-enabled collection with access to the admin panel
+- **Media**: Upload-enabled collection for file storage
 
-  Users are auth-enabled collections that have access to the admin panel.
+For additional help, see the official [Auth Example](https://github.com/payloadcms/payload/tree/main/examples/auth) or the [Authentication](https://payloadcms.com/docs/authentication/overview#authentication-overview) docs.
 
-  For additional help, see the official [Auth Example](https://github.com/payloadcms/payload/tree/main/examples/auth) or the [Authentication](https://payloadcms.com/docs/authentication/overview#authentication-overview) docs.
+## Next Steps
 
-- #### Media
+After getting the app running:
 
-  This is the uploads enabled collection. It features pre-configured sizes, focal point and manual resizing to help you manage your pictures.
+1. **Populate initial data** - Add schedules, categories, payees, and accounts (see [GETTING_STARTED.md](./GETTING_STARTED.md))
+2. **Create templates** - Define your recurring budget items
+3. **Build your first budget** - Create a budget period for your next paycheck
+4. **Add automation** - Implement hooks to auto-populate periods (see `src/hooks/budgetPeriodHooks.example.ts`)
+5. **Build a frontend** - Create a user-friendly interface for your wife to manage the budget
+
+## Future Enhancements
+
+- Auto-populate budget periods from templates
+- Auto-calculate summary totals
+- Account balance tracking with transaction hooks
+- Custom API endpoints for reporting
+- Budget vs actual comparison reports
+- Account balance history and forecasting
+- Mobile-friendly frontend
 
 ### Docker
 

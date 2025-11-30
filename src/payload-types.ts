@@ -69,6 +69,13 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    'income-categories': IncomeCategory;
+    'expense-categories': ExpenseCategory;
+    payees: Payee;
+    accounts: Account;
+    'recurring-items': RecurringItem;
+    budgets: Budget;
+    transactions: Transaction;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,6 +85,13 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    'income-categories': IncomeCategoriesSelect<false> | IncomeCategoriesSelect<true>;
+    'expense-categories': ExpenseCategoriesSelect<false> | ExpenseCategoriesSelect<true>;
+    payees: PayeesSelect<false> | PayeesSelect<true>;
+    accounts: AccountsSelect<false> | AccountsSelect<true>;
+    'recurring-items': RecurringItemsSelect<false> | RecurringItemsSelect<true>;
+    budgets: BudgetsSelect<false> | BudgetsSelect<true>;
+    transactions: TransactionsSelect<false> | TransactionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -86,6 +100,7 @@ export interface Config {
   db: {
     defaultIDType: string;
   };
+  fallbackLocale: null;
   globals: {};
   globalsSelect: {};
   locale: null;
@@ -159,6 +174,402 @@ export interface Media {
   focalY?: number | null;
 }
 /**
+ * ✅ Auto-seeded • Income categories (edit or add more as needed)
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "income-categories".
+ */
+export interface IncomeCategory {
+  id: string;
+  name: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * ✅ Auto-seeded • Expense categories (edit or add more as needed)
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "expense-categories".
+ */
+export interface ExpenseCategory {
+  id: string;
+  name: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * 📋 Step 1: Add payees (employers, landlords, stores, etc.)
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payees".
+ */
+export interface Payee {
+  id: string;
+  name: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * 📋 Step 2: Add your bank accounts (checking, savings, credit cards)
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "accounts".
+ */
+export interface Account {
+  id: string;
+  name: string;
+  description?: string | null;
+  accountType: 'checking' | 'savings' | 'credit_card' | 'cash' | 'investment' | 'other';
+  /**
+   * The initial balance of this account
+   */
+  startingBalance: number;
+  /**
+   * The current balance (updated automatically by transactions)
+   */
+  currentBalance: number;
+  hasInterestRate?: boolean | null;
+  /**
+   * Annual interest rate (e.g., 5.5 for 5.5%)
+   */
+  interestRate?: number | null;
+  /**
+   * How often this occurs
+   */
+  scheduleType:
+    | 'weekly'
+    | 'biweekly'
+    | 'monthly'
+    | 'bimonthly_1_15'
+    | 'bimonthly_15_last'
+    | 'quarterly'
+    | 'semiannually'
+    | 'annually';
+  /**
+   * Which day of the week does this occur?
+   */
+  dayOfWeek?: ('0' | '1' | '2' | '3' | '4' | '5' | '6') | null;
+  /**
+   * When did/will this bi-weekly cycle start? (e.g., your first paycheck date)
+   */
+  anchorDate?: string | null;
+  /**
+   * Which day of the month does this occur?
+   */
+  dayOfMonth?:
+    | (
+        | '1'
+        | '2'
+        | '3'
+        | '4'
+        | '5'
+        | '6'
+        | '7'
+        | '8'
+        | '9'
+        | '10'
+        | '11'
+        | '12'
+        | '13'
+        | '14'
+        | '15'
+        | '16'
+        | '17'
+        | '18'
+        | '19'
+        | '20'
+        | '21'
+        | '22'
+        | '23'
+        | '24'
+        | '25'
+        | '26'
+        | '27'
+        | '28'
+        | '29'
+        | '30'
+        | 'last'
+      )
+    | null;
+  /**
+   * Which month does this occur?
+   */
+  month?: ('1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * 📋 Step 3: Define your recurring income, expenses, and transfers
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "recurring-items".
+ */
+export interface RecurringItem {
+  id: string;
+  /**
+   * What type of recurring item is this?
+   */
+  itemType: 'income' | 'expense' | 'transfer';
+  name: string;
+  amount: number;
+  /**
+   * Income category
+   */
+  incomeCategory?: (string | null) | IncomeCategory;
+  /**
+   * Expense category
+   */
+  expenseCategory?: (string | null) | ExpenseCategory;
+  /**
+   * Who you pay (expense) or who pays you (income)
+   */
+  payee?: (string | null) | Payee;
+  /**
+   * Account this income is deposited to or expense is paid from
+   */
+  account?: (string | null) | Account;
+  /**
+   * Account to transfer from
+   */
+  fromAccount?: (string | null) | Account;
+  /**
+   * Account to transfer to
+   */
+  toAccount?: (string | null) | Account;
+  /**
+   * Does this expense have a balance to track (e.g., credit card, loan)?
+   */
+  hasBalance?: boolean | null;
+  balance?: {
+    currentBalance?: number | null;
+    /**
+     * Annual interest rate (e.g., 18.5 for 18.5%)
+     */
+    interestRate?: number | null;
+  };
+  /**
+   * How often this occurs
+   */
+  scheduleType:
+    | 'weekly'
+    | 'biweekly'
+    | 'monthly'
+    | 'bimonthly_1_15'
+    | 'bimonthly_15_last'
+    | 'quarterly'
+    | 'semiannually'
+    | 'annually';
+  /**
+   * Which day of the week does this occur?
+   */
+  dayOfWeek?: ('0' | '1' | '2' | '3' | '4' | '5' | '6') | null;
+  /**
+   * When did/will this bi-weekly cycle start? (e.g., your first paycheck date)
+   */
+  anchorDate?: string | null;
+  /**
+   * Which day of the month does this occur?
+   */
+  dayOfMonth?:
+    | (
+        | '1'
+        | '2'
+        | '3'
+        | '4'
+        | '5'
+        | '6'
+        | '7'
+        | '8'
+        | '9'
+        | '10'
+        | '11'
+        | '12'
+        | '13'
+        | '14'
+        | '15'
+        | '16'
+        | '17'
+        | '18'
+        | '19'
+        | '20'
+        | '21'
+        | '22'
+        | '23'
+        | '24'
+        | '25'
+        | '26'
+        | '27'
+        | '28'
+        | '29'
+        | '30'
+        | 'last'
+      )
+    | null;
+  /**
+   * Which month does this occur?
+   */
+  month?: ('1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12') | null;
+  /**
+   * Inactive items will not be included in new budget periods
+   */
+  isActive?: boolean | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Create a new budget for each paycheck cycle. Set up Templates first!
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "budgets".
+ */
+export interface Budget {
+  id: string;
+  /**
+   * E.g., "December 15th Paycheck" or "Budget 2024-01-15"
+   */
+  name: string;
+  startDate: string;
+  endDate: string;
+  status: 'active' | 'completed' | 'archived';
+  /**
+   * Income for this budget period
+   */
+  income?:
+    | {
+        /**
+         * The recurring item this was created from (if any)
+         */
+        recurringItem?: (string | null) | RecurringItem;
+        name: string;
+        amount: number;
+        /**
+         * Actual amount received (if different from planned)
+         */
+        actualAmount?: number | null;
+        category: string | IncomeCategory;
+        payee: string | Payee;
+        account: string | Account;
+        date?: string | null;
+        received?: boolean | null;
+        notes?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Expenses for this budget period
+   */
+  expenses?:
+    | {
+        /**
+         * The recurring item this was created from (if any)
+         */
+        recurringItem?: (string | null) | RecurringItem;
+        name: string;
+        amount: number;
+        /**
+         * Actual amount paid (if different from planned)
+         */
+        actualAmount?: number | null;
+        category: string | ExpenseCategory;
+        payee: string | Payee;
+        account: string | Account;
+        dueDate?: string | null;
+        paid?: boolean | null;
+        notes?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Transfers between accounts for this budget period
+   */
+  transfers?:
+    | {
+        /**
+         * The recurring item this was created from (if any)
+         */
+        recurringItem?: (string | null) | RecurringItem;
+        name: string;
+        amount: number;
+        fromAccount: string | Account;
+        toAccount: string | Account;
+        date?: string | null;
+        completed?: boolean | null;
+        notes?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Calculated totals (can be computed on save or via hook)
+   */
+  summary?: {
+    totalIncome?: number | null;
+    totalExpenses?: number | null;
+    /**
+     * Total Income - Total Expenses
+     */
+    netIncome?: number | null;
+  };
+  notes?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Historical record of all financial transactions (optional)
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions".
+ */
+export interface Transaction {
+  id: string;
+  date: string;
+  type: 'income' | 'expense' | 'transfer';
+  description: string;
+  amount: number;
+  /**
+   * Which budget this transaction belongs to
+   */
+  budget: string | Budget;
+  incomeDetails?: {
+    category?: (string | null) | IncomeCategory;
+    payee?: (string | null) | Payee;
+    account?: (string | null) | Account;
+  };
+  expenseDetails?: {
+    category?: (string | null) | ExpenseCategory;
+    payee?: (string | null) | Payee;
+    account?: (string | null) | Account;
+  };
+  transferDetails?: {
+    fromAccount?: (string | null) | Account;
+    toAccount?: (string | null) | Account;
+  };
+  notes?: string | null;
+  /**
+   * Has this transaction been reconciled with your bank statement?
+   */
+  reconciled?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -189,6 +600,34 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: string | Media;
+      } | null)
+    | ({
+        relationTo: 'income-categories';
+        value: string | IncomeCategory;
+      } | null)
+    | ({
+        relationTo: 'expense-categories';
+        value: string | ExpenseCategory;
+      } | null)
+    | ({
+        relationTo: 'payees';
+        value: string | Payee;
+      } | null)
+    | ({
+        relationTo: 'accounts';
+        value: string | Account;
+      } | null)
+    | ({
+        relationTo: 'recurring-items';
+        value: string | RecurringItem;
+      } | null)
+    | ({
+        relationTo: 'budgets';
+        value: string | Budget;
+      } | null)
+    | ({
+        relationTo: 'transactions';
+        value: string | Transaction;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -271,6 +710,185 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "income-categories_select".
+ */
+export interface IncomeCategoriesSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "expense-categories_select".
+ */
+export interface ExpenseCategoriesSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payees_select".
+ */
+export interface PayeesSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "accounts_select".
+ */
+export interface AccountsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  accountType?: T;
+  startingBalance?: T;
+  currentBalance?: T;
+  hasInterestRate?: T;
+  interestRate?: T;
+  scheduleType?: T;
+  dayOfWeek?: T;
+  anchorDate?: T;
+  dayOfMonth?: T;
+  month?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "recurring-items_select".
+ */
+export interface RecurringItemsSelect<T extends boolean = true> {
+  itemType?: T;
+  name?: T;
+  amount?: T;
+  incomeCategory?: T;
+  expenseCategory?: T;
+  payee?: T;
+  account?: T;
+  fromAccount?: T;
+  toAccount?: T;
+  hasBalance?: T;
+  balance?:
+    | T
+    | {
+        currentBalance?: T;
+        interestRate?: T;
+      };
+  scheduleType?: T;
+  dayOfWeek?: T;
+  anchorDate?: T;
+  dayOfMonth?: T;
+  month?: T;
+  isActive?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "budgets_select".
+ */
+export interface BudgetsSelect<T extends boolean = true> {
+  name?: T;
+  startDate?: T;
+  endDate?: T;
+  status?: T;
+  income?:
+    | T
+    | {
+        recurringItem?: T;
+        name?: T;
+        amount?: T;
+        actualAmount?: T;
+        category?: T;
+        payee?: T;
+        account?: T;
+        date?: T;
+        received?: T;
+        notes?: T;
+        id?: T;
+      };
+  expenses?:
+    | T
+    | {
+        recurringItem?: T;
+        name?: T;
+        amount?: T;
+        actualAmount?: T;
+        category?: T;
+        payee?: T;
+        account?: T;
+        dueDate?: T;
+        paid?: T;
+        notes?: T;
+        id?: T;
+      };
+  transfers?:
+    | T
+    | {
+        recurringItem?: T;
+        name?: T;
+        amount?: T;
+        fromAccount?: T;
+        toAccount?: T;
+        date?: T;
+        completed?: T;
+        notes?: T;
+        id?: T;
+      };
+  summary?:
+    | T
+    | {
+        totalIncome?: T;
+        totalExpenses?: T;
+        netIncome?: T;
+      };
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions_select".
+ */
+export interface TransactionsSelect<T extends boolean = true> {
+  date?: T;
+  type?: T;
+  description?: T;
+  amount?: T;
+  budget?: T;
+  incomeDetails?:
+    | T
+    | {
+        category?: T;
+        payee?: T;
+        account?: T;
+      };
+  expenseDetails?:
+    | T
+    | {
+        category?: T;
+        payee?: T;
+        account?: T;
+      };
+  transferDetails?:
+    | T
+    | {
+        fromAccount?: T;
+        toAccount?: T;
+      };
+  notes?: T;
+  reconciled?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
