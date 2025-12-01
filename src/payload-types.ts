@@ -76,6 +76,8 @@ export interface Config {
     transactions: Transaction;
     'recurring-items': RecurringItem;
     budgets: Budget;
+    'budget-items': BudgetItem;
+    'budget-schedules': BudgetSchedule;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -92,6 +94,8 @@ export interface Config {
     transactions: TransactionsSelect<false> | TransactionsSelect<true>;
     'recurring-items': RecurringItemsSelect<false> | RecurringItemsSelect<true>;
     budgets: BudgetsSelect<false> | BudgetsSelect<true>;
+    'budget-items': BudgetItemsSelect<false> | BudgetItemsSelect<true>;
+    'budget-schedules': BudgetSchedulesSelect<false> | BudgetSchedulesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -513,6 +517,134 @@ export interface Budget {
   createdAt: string;
 }
 /**
+ * Tracks recurring items within budget periods and their actualization status
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "budget-items".
+ */
+export interface BudgetItem {
+  id: string;
+  /**
+   * The budget period this item belongs to
+   */
+  budget: string | Budget;
+  /**
+   * The recurring item this budget item is based on
+   */
+  recurringItem: string | RecurringItem;
+  /**
+   * When this item is due/expected within the budget period
+   */
+  dueDate: string;
+  /**
+   * Has this budget item been recorded as a transaction?
+   */
+  isActualized?: boolean | null;
+  /**
+   * The transaction that actualized this budget item
+   */
+  transaction?: (string | null) | Transaction;
+  /**
+   * Optional notes about this budget item
+   */
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Automated budget period creation and management
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "budget-schedules".
+ */
+export interface BudgetSchedule {
+  id: string;
+  /**
+   * A name for this budget schedule
+   */
+  name: string;
+  /**
+   * Which account to create budgets for
+   */
+  account: string | Account;
+  /**
+   * How often to create new budget periods
+   */
+  scheduleType:
+    | 'weekly'
+    | 'biweekly'
+    | 'monthly'
+    | 'bimonthly_1_15'
+    | 'bimonthly_15_last'
+    | 'quarterly'
+    | 'semiannually'
+    | 'annually';
+  /**
+   * Which day of the week does this occur?
+   */
+  dayOfWeek?: ('0' | '1' | '2' | '3' | '4' | '5' | '6') | null;
+  /**
+   * When did/will this bi-weekly cycle start? (e.g., your first paycheck date)
+   */
+  anchorDate?: string | null;
+  /**
+   * Which day of the month does this occur?
+   */
+  dayOfMonth?:
+    | (
+        | '1'
+        | '2'
+        | '3'
+        | '4'
+        | '5'
+        | '6'
+        | '7'
+        | '8'
+        | '9'
+        | '10'
+        | '11'
+        | '12'
+        | '13'
+        | '14'
+        | '15'
+        | '16'
+        | '17'
+        | '18'
+        | '19'
+        | '20'
+        | '21'
+        | '22'
+        | '23'
+        | '24'
+        | '25'
+        | '26'
+        | '27'
+        | '28'
+        | '29'
+        | '30'
+        | 'last'
+      )
+    | null;
+  /**
+   * Which month does this occur?
+   */
+  month?: ('1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12') | null;
+  /**
+   * Template for budget names. Use {start} and {end} for dates.
+   */
+  budgetNamePattern?: string | null;
+  /**
+   * Enable automatic budget creation for this schedule
+   */
+  isActive?: boolean | null;
+  /**
+   * How many future "planned" budgets to maintain
+   */
+  lookAhead?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -571,6 +703,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'budgets';
         value: string | Budget;
+      } | null)
+    | ({
+        relationTo: 'budget-items';
+        value: string | BudgetItem;
+      } | null)
+    | ({
+        relationTo: 'budget-schedules';
+        value: string | BudgetSchedule;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -780,6 +920,38 @@ export interface BudgetsSelect<T extends boolean = true> {
   endDate?: T;
   status?: T;
   notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "budget-items_select".
+ */
+export interface BudgetItemsSelect<T extends boolean = true> {
+  budget?: T;
+  recurringItem?: T;
+  dueDate?: T;
+  isActualized?: T;
+  transaction?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "budget-schedules_select".
+ */
+export interface BudgetSchedulesSelect<T extends boolean = true> {
+  name?: T;
+  account?: T;
+  scheduleType?: T;
+  dayOfWeek?: T;
+  anchorDate?: T;
+  dayOfMonth?: T;
+  month?: T;
+  budgetNamePattern?: T;
+  isActive?: T;
+  lookAhead?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -12,17 +12,22 @@ interface SetupStatus {
   accounts: number
 }
 
-interface Account {
+interface BudgetAutomation {
   id: string
   name: string
-  accountType: string
-  currentBalance: number
+  account: {
+    id: string
+    name: string
+    accountType: string
+    currentBalance: number
+  }
+  scheduleType: string
+  isActive: boolean
 }
 
 const Dashboard: React.FC = () => {
   const [status, setStatus] = useState<SetupStatus | null>(null)
-  const [accounts, setAccounts] = useState<Account[]>([])
-  const [userDefaultAccount, setUserDefaultAccount] = useState<string | undefined>(undefined)
+  const [automations, setAutomations] = useState<BudgetAutomation[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -54,27 +59,13 @@ const Dashboard: React.FC = () => {
 
         setStatus(statusObj)
 
-        // Fetch full account data if setup is complete
+        // Fetch budget automations if setup is complete
         if (statusObj.payees > 0 && statusObj.accounts > 0) {
-          const accountsResponse = await fetch('/api/accounts?limit=100')
-          const accountsData = await accountsResponse.json()
-          setAccounts(accountsData.docs || [])
-
-          // Fetch user's default account preference
-          try {
-            const meResponse = await fetch('/api/users/me')
-            const userData = await meResponse.json()
-            if (userData?.user?.defaultAccount) {
-              // Handle both populated and unpopulated relationship
-              const defaultAccountId =
-                typeof userData.user.defaultAccount === 'string'
-                  ? userData.user.defaultAccount
-                  : userData.user.defaultAccount?.id
-              setUserDefaultAccount(defaultAccountId)
-            }
-          } catch (error) {
-            console.error('Error fetching user preferences:', error)
-          }
+          const automationsResponse = await fetch(
+            '/api/budget-schedules?where[isActive][equals]=true&limit=100&depth=1',
+          )
+          const automationsData = await automationsResponse.json()
+          setAutomations(automationsData.docs || [])
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error)
@@ -111,7 +102,7 @@ const Dashboard: React.FC = () => {
   }
 
   // Show budget dashboard if setup is complete
-  return <BudgetDashboard accounts={accounts} userDefaultAccount={userDefaultAccount} />
+  return <BudgetDashboard automations={automations} />
 }
 
 export default Dashboard

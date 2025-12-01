@@ -1,10 +1,11 @@
 'use client'
 
-import { useFormFields } from '@payloadcms/ui'
+import { useDocumentInfo, useFormFields } from '@payloadcms/ui'
 import React, { useEffect, useState } from 'react'
 
 interface Projections {
-  currentBalance: number
+  startingBalance: number
+  currentAccountBalance: number
   income: number
   expenses: number
   projectedBalance: number
@@ -16,12 +17,14 @@ interface Projections {
 }
 
 export const BudgetProjections: React.FC = () => {
+  const { id: budgetId } = useDocumentInfo()
   const startDate = useFormFields(([fields]) => fields.startDate)
   const endDate = useFormFields(([fields]) => fields.endDate)
   const account = useFormFields(([fields]) => fields.account)
 
   const [projections, setProjections] = useState<Projections>({
-    currentBalance: 0,
+    startingBalance: 0,
+    currentAccountBalance: 0,
     income: 0,
     expenses: 0,
     projectedBalance: 0,
@@ -36,7 +39,8 @@ export const BudgetProjections: React.FC = () => {
     const calculateProjections = async () => {
       if (!startDate?.value || !endDate?.value || !account?.value) {
         setProjections({
-          currentBalance: 0,
+          startingBalance: 0,
+          currentAccountBalance: 0,
           income: 0,
           expenses: 0,
           projectedBalance: 0,
@@ -57,9 +61,9 @@ export const BudgetProjections: React.FC = () => {
             ? (account.value as { id: string }).id
             : account.value
 
-        const response = await fetch(
-          `/api/budget-projections?startDate=${startDate.value}&endDate=${endDate.value}&account=${accountId}`,
-        )
+        const url = `/api/budget-projections?startDate=${startDate.value}&endDate=${endDate.value}&account=${accountId}${budgetId ? `&budgetId=${budgetId}` : ''}`
+
+        const response = await fetch(url)
 
         if (!response.ok) {
           throw new Error('Failed to fetch projections')
@@ -74,7 +78,7 @@ export const BudgetProjections: React.FC = () => {
     }
 
     calculateProjections()
-  }, [startDate?.value, endDate?.value, account?.value])
+  }, [startDate?.value, endDate?.value, account?.value, budgetId])
 
   if (projections.loading) {
     return (
@@ -105,8 +109,13 @@ export const BudgetProjections: React.FC = () => {
 
       <div style={{ display: 'grid', gap: '0.75rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ color: 'var(--theme-elevation-600)' }}>Current Balance:</span>
-          <span style={{ fontWeight: 600 }}>${projections.currentBalance.toFixed(2)}</span>
+          <span style={{ color: 'var(--theme-elevation-600)' }}>Starting Balance:</span>
+          <span style={{ fontWeight: 600 }}>${projections.startingBalance.toFixed(2)}</span>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ color: 'var(--theme-elevation-600)' }}>Current Account Balance:</span>
+          <span style={{ fontWeight: 600 }}>${projections.currentAccountBalance.toFixed(2)}</span>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

@@ -9,6 +9,7 @@ export const Accounts: CollectionConfig = {
   slug: 'accounts',
   admin: {
     useAsTitle: 'name',
+    defaultColumns: ['name', 'accountType', 'currentBalance'],
     description: 'Bank accounts, credit cards, and cash accounts',
     group: '⚙️ System',
   },
@@ -57,9 +58,20 @@ export const Accounts: CollectionConfig = {
       defaultValue: 0,
       admin: {
         description: 'The current balance (updated automatically by transactions)',
+        readOnly: true,
         components: {
           Cell: '/components/CurrencyCell#CurrencyCell',
         },
+      },
+    },
+    {
+      type: 'ui',
+      name: 'recalculateBalance',
+      admin: {
+        components: {
+          Field: '/components/RecalculateBalanceButton#RecalculateBalanceButton',
+        },
+        position: 'sidebar',
       },
     },
     {

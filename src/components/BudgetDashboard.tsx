@@ -2,13 +2,20 @@
 
 import { Gutter } from '@payloadcms/ui'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { BudgetItemsList } from './BudgetItemsList'
 
-interface Account {
+interface BudgetAutomation {
   id: string
   name: string
-  accountType: string
-  currentBalance: number
+  account: {
+    id: string
+    name: string
+    accountType: string
+    currentBalance: number
+  }
+  scheduleType: string
+  isActive: boolean
 }
 
 interface Budget {
@@ -20,7 +27,8 @@ interface Budget {
 }
 
 interface BudgetProjection {
-  currentBalance: number
+  startingBalance: number
+  currentAccountBalance: number
   income: number
   expenses: number
   projectedBalance: number
@@ -28,76 +36,100 @@ interface BudgetProjection {
   expenseCount: number
   transferInCount: number
   transferOutCount: number
+  items: {
+    income: Array<{
+      id: string
+      name: string
+      amount: number
+      categoryId: string | null
+      categoryName: string | null
+      payeeId: string | null
+      payeeName: string | null
+      isActual?: boolean
+    }>
+    expenses: Array<{
+      id: string
+      name: string
+      amount: number
+      categoryId: string | null
+      categoryName: string | null
+      payeeId: string | null
+      payeeName: string | null
+      isActual?: boolean
+    }>
+    transfers: Array<{
+      id: string
+      name: string
+      amount: number
+      direction: 'in' | 'out'
+      otherAccountId: string | null
+      otherAccountName: string | null
+      isActual?: boolean
+    }>
+  }
 }
 
 interface BudgetDashboardProps {
-  accounts: Account[]
-  userDefaultAccount?: string
+  automations: BudgetAutomation[]
 }
 
-export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
-  accounts,
-  userDefaultAccount,
-}) => {
-  const [currentAccountIndex, setCurrentAccountIndex] = useState(0)
+export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({ automations }) => {
+  const [currentAutomationIndex, setCurrentAutomationIndex] = useState(0)
   const [activeBudget, setActiveBudget] = useState<Budget | null>(null)
   const [projections, setProjections] = useState<BudgetProjection | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // Initialize with default account if provided
-  useEffect(() => {
-    if (userDefaultAccount && accounts.length > 0) {
-      const defaultIndex = accounts.findIndex((acc) => acc.id === userDefaultAccount)
-      if (defaultIndex !== -1) {
-        setCurrentAccountIndex(defaultIndex)
-      }
-    }
-  }, [userDefaultAccount, accounts])
+  const currentAutomation = automations[currentAutomationIndex]
+  const currentAccount = currentAutomation?.account
 
-  const currentAccount = accounts[currentAccountIndex]
-
-  // Fetch active budget for current account
-  useEffect(() => {
+  // Fetch active budget and projections for current automation
+  const fetchActiveBudget = useCallback(async () => {
     if (!currentAccount) return
 
-    const fetchActiveBudget = async () => {
-      setLoading(true)
-      try {
-        const response = await fetch(
-          `/api/budgets?where[account][equals]=${currentAccount.id}&where[status][equals]=active&limit=1`,
+    setLoading(true)
+
+    try {
+      // Trigger auto-advance for this account
+      await fetch(`/api/budget-auto-advance?account=${currentAccount.id}`)
+
+      // Then fetch the active budget
+      const response = await fetch(
+        `/api/budgets?where[account][equals]=${currentAccount.id}&where[status][equals]=active&limit=1`,
+      )
+      const data = await response.json()
+      const budget = data.docs?.[0] || null
+      setActiveBudget(budget)
+
+      // Fetch projections if budget exists
+      if (budget) {
+        const projResponse = await fetch(
+          `/api/budget-projections?startDate=${budget.startDate}&endDate=${budget.endDate}&account=${currentAccount.id}&budgetId=${budget.id}`,
         )
-        const data = await response.json()
-        const budget = data.docs?.[0] || null
-        setActiveBudget(budget)
-
-        // Fetch projections if budget exists
-        if (budget) {
-          const projResponse = await fetch(
-            `/api/budget-projections?startDate=${budget.startDate}&endDate=${budget.endDate}&account=${currentAccount.id}`,
-          )
-          const projData = await projResponse.json()
-          setProjections(projData)
-        } else {
-          setProjections(null)
-        }
-      } catch (error) {
-        console.error('Error fetching budget:', error)
-        setActiveBudget(null)
+        const projData = await projResponse.json()
+        setProjections(projData)
+      } else {
         setProjections(null)
-      } finally {
-        setLoading(false)
       }
+    } catch (error) {
+      console.error('Error fetching budget:', error)
+      setActiveBudget(null)
+      setProjections(null)
+    } finally {
+      setLoading(false)
     }
-
-    fetchActiveBudget()
   }, [currentAccount])
 
-  const handlePrevAccount = () => {
-    setCurrentAccountIndex((prev) => (prev > 0 ? prev - 1 : accounts.length - 1))
+  // Fetch active budget for current automation
+  useEffect(() => {
+    fetchActiveBudget()
+  }, [fetchActiveBudget])
+
+  const handlePrevAutomation = () => {
+    setCurrentAutomationIndex((prev) => (prev > 0 ? prev - 1 : automations.length - 1))
   }
 
-  const handleNextAccount = () => {
-    setCurrentAccountIndex((prev) => (prev < accounts.length - 1 ? prev + 1 : 0))
+  const handleNextAutomation = () => {
+    setCurrentAutomationIndex((prev) => (prev < automations.length - 1 ? prev + 1 : 0))
   }
 
   const formatCurrency = (amount: number) => {
@@ -115,19 +147,31 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
     })
   }
 
-  if (accounts.length === 0) {
+  if (automations.length === 0) {
     return (
       <Gutter>
         <h1 style={{ marginBottom: 'var(--spacing-m)' }}>Budget Dashboard</h1>
-        <p style={{ marginBottom: 'var(--spacing-m)' }}>
-          <strong>⚠️ No accounts found</strong>
-        </p>
-        <p style={{ marginBottom: 'var(--spacing-m)', color: 'var(--theme-elevation-700)' }}>
-          You need to add at least one account to start managing budgets.
-        </p>
-        <Link href="/admin/collections/accounts/create" className="btn btn--style-primary">
-          Add Account →
-        </Link>
+        <div
+          style={{
+            background: 'var(--theme-elevation-50)',
+            padding: 'var(--spacing-xxl)',
+            borderRadius: 'var(--border-radius)',
+            border: '1px solid var(--theme-elevation-150)',
+            textAlign: 'center',
+          }}
+        >
+          <div style={{ fontSize: '3rem', marginBottom: 'var(--spacing-m)' }}>⚙️</div>
+          <h2 style={{ marginBottom: 'var(--spacing-m)' }}>No Budget Automations</h2>
+          <p style={{ marginBottom: 'var(--spacing-l)', color: 'var(--theme-elevation-700)' }}>
+            Create a budget automation to automatically manage budget periods for your accounts.
+          </p>
+          <Link
+            href="/admin/collections/budget-schedules/create"
+            className="btn btn--style-primary"
+          >
+            Create Budget Automation
+          </Link>
+        </div>
       </Gutter>
     )
   }
@@ -137,11 +181,11 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
       <div style={{ paddingBottom: 'var(--spacing-xl)' }}>
         <h1 style={{ marginBottom: 'var(--spacing-l)' }}>Budget Dashboard</h1>
 
-        {/* Account Selector */}
-        {accounts.length > 1 ? (
+        {/* Automation Selector */}
+        {automations.length > 1 ? (
           <div style={{ marginBottom: 'var(--spacing-xl)' }}>
             <h3 style={{ marginBottom: 'var(--spacing-m)', fontSize: '1rem', fontWeight: '600' }}>
-              Account
+              Budget Automation
             </h3>
             <div
               style={{
@@ -155,7 +199,7 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
               }}
             >
               <button
-                onClick={handlePrevAccount}
+                onClick={handlePrevAutomation}
                 className="btn btn--style-secondary btn--size-small"
               >
                 ← Previous
@@ -169,11 +213,11 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
                     fontSize: '0.875rem',
                   }}
                 >
-                  ({currentAccountIndex + 1} of {accounts.length})
+                  ({currentAutomationIndex + 1} of {automations.length})
                 </span>
               </div>
               <button
-                onClick={handleNextAccount}
+                onClick={handleNextAutomation}
                 className="btn btn--style-secondary btn--size-small"
               >
                 Next →
@@ -183,7 +227,7 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
         ) : (
           <div style={{ marginBottom: 'var(--spacing-xl)' }}>
             <h3 style={{ marginBottom: 'var(--spacing-m)', fontSize: '1rem', fontWeight: '600' }}>
-              Account
+              Budget Automation
             </h3>
             <p style={{ fontSize: '1.125rem', fontWeight: '600', margin: 0 }}>
               {currentAccount.name}
@@ -265,10 +309,24 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
                             marginBottom: 'var(--spacing-xs)',
                           }}
                         >
+                          Starting Balance
+                        </div>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>
+                          {formatCurrency(projections.startingBalance)}
+                        </div>
+                      </div>
+                      <div>
+                        <div
+                          style={{
+                            fontSize: '0.75rem',
+                            color: 'var(--theme-elevation-600)',
+                            marginBottom: 'var(--spacing-xs)',
+                          }}
+                        >
                           Current Balance
                         </div>
                         <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>
-                          {formatCurrency(projections.currentBalance)}
+                          {formatCurrency(projections.currentAccountBalance)}
                         </div>
                       </div>
                       <div>
@@ -326,9 +384,9 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
                             fontSize: '1.25rem',
                             fontWeight: 'bold',
                             color:
-                              projections.projectedBalance > projections.currentBalance
+                              projections.projectedBalance > projections.startingBalance
                                 ? 'var(--theme-success-500)'
-                                : projections.projectedBalance < projections.currentBalance
+                                : projections.projectedBalance < projections.startingBalance
                                   ? 'var(--theme-error-500)'
                                   : 'inherit',
                           }}
@@ -357,8 +415,254 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
               )}
             </div>
 
+            {/* Budget Items */}
+            {projections && projections.items && (
+              <>
+                <BudgetItemsList
+                  incomeItems={projections.items.income.filter((i) => !i.isActual)}
+                  expenseItems={projections.items.expenses.filter((i) => !i.isActual)}
+                  transferItems={projections.items.transfers.filter((i) => !i.isActual)}
+                  budgetId={activeBudget.id}
+                  accountId={currentAccount.id}
+                  onRefresh={fetchActiveBudget}
+                />
+
+                {/* Transactions in this budget period */}
+                <div style={{ marginTop: 'var(--spacing-xxl)' }}>
+                  <h4
+                    style={{
+                      marginBottom: 'var(--spacing-m)',
+                      fontSize: '0.875rem',
+                      fontWeight: '600',
+                      textTransform: 'uppercase',
+                      color: 'var(--theme-elevation-600)',
+                    }}
+                  >
+                    Transactions in Period
+                  </h4>
+
+                  {/* Income Transactions */}
+                  {projections.items.income.filter((i) => i.isActual).length > 0 && (
+                    <div style={{ marginBottom: 'var(--spacing-l)' }}>
+                      <h5
+                        style={{
+                          marginBottom: 'var(--spacing-s)',
+                          fontSize: '0.875rem',
+                          fontWeight: '600',
+                          color: 'var(--theme-success-500)',
+                        }}
+                      >
+                        Income
+                      </h5>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 'var(--spacing-s)',
+                        }}
+                      >
+                        {projections.items.income
+                          .filter((i) => i.isActual)
+                          .map((item) => (
+                            <div
+                              key={item.id}
+                              style={{
+                                background: 'var(--theme-elevation-0)',
+                                border: '1px solid var(--theme-elevation-150)',
+                                borderRadius: 'var(--border-radius)',
+                                padding: 'var(--spacing-m)',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                              }}
+                            >
+                              <div style={{ flex: 1 }}>
+                                <div
+                                  style={{ fontWeight: '600', marginBottom: 'var(--spacing-xs)' }}
+                                >
+                                  {item.name}
+                                </div>
+                                <div
+                                  style={{
+                                    fontSize: '0.875rem',
+                                    color: 'var(--theme-elevation-600)',
+                                  }}
+                                >
+                                  {item.categoryName && (
+                                    <span style={{ marginRight: 'var(--spacing-s)' }}>
+                                      📁 {item.categoryName}
+                                    </span>
+                                  )}
+                                  {item.payeeName && <span>👤 {item.payeeName}</span>}
+                                </div>
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: '1.125rem',
+                                  fontWeight: 'bold',
+                                  color: 'var(--theme-success-500)',
+                                }}
+                              >
+                                +{formatCurrency(item.amount)}
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Expense Transactions */}
+                  {projections.items.expenses.filter((i) => i.isActual).length > 0 && (
+                    <div style={{ marginBottom: 'var(--spacing-l)' }}>
+                      <h5
+                        style={{
+                          marginBottom: 'var(--spacing-s)',
+                          fontSize: '0.875rem',
+                          fontWeight: '600',
+                          color: 'var(--theme-error-500)',
+                        }}
+                      >
+                        Expenses
+                      </h5>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 'var(--spacing-s)',
+                        }}
+                      >
+                        {projections.items.expenses
+                          .filter((i) => i.isActual)
+                          .map((item) => (
+                            <div
+                              key={item.id}
+                              style={{
+                                background: 'var(--theme-elevation-0)',
+                                border: '1px solid var(--theme-elevation-150)',
+                                borderRadius: 'var(--border-radius)',
+                                padding: 'var(--spacing-m)',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                              }}
+                            >
+                              <div style={{ flex: 1 }}>
+                                <div
+                                  style={{ fontWeight: '600', marginBottom: 'var(--spacing-xs)' }}
+                                >
+                                  {item.name}
+                                </div>
+                                <div
+                                  style={{
+                                    fontSize: '0.875rem',
+                                    color: 'var(--theme-elevation-600)',
+                                  }}
+                                >
+                                  {item.categoryName && (
+                                    <span style={{ marginRight: 'var(--spacing-s)' }}>
+                                      📁 {item.categoryName}
+                                    </span>
+                                  )}
+                                  {item.payeeName && <span>👤 {item.payeeName}</span>}
+                                </div>
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: '1.125rem',
+                                  fontWeight: 'bold',
+                                  color: 'var(--theme-error-500)',
+                                }}
+                              >
+                                -{formatCurrency(item.amount)}
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Transfer Transactions */}
+                  {projections.items.transfers.filter((i) => i.isActual).length > 0 && (
+                    <div style={{ marginBottom: 'var(--spacing-l)' }}>
+                      <h5
+                        style={{
+                          marginBottom: 'var(--spacing-s)',
+                          fontSize: '0.875rem',
+                          fontWeight: '600',
+                        }}
+                      >
+                        Transfers
+                      </h5>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 'var(--spacing-s)',
+                        }}
+                      >
+                        {projections.items.transfers
+                          .filter((i) => i.isActual)
+                          .map((item) => (
+                            <div
+                              key={item.id}
+                              style={{
+                                background: 'var(--theme-elevation-0)',
+                                border: '1px solid var(--theme-elevation-150)',
+                                borderRadius: 'var(--border-radius)',
+                                padding: 'var(--spacing-m)',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                              }}
+                            >
+                              <div style={{ flex: 1 }}>
+                                <div
+                                  style={{ fontWeight: '600', marginBottom: 'var(--spacing-xs)' }}
+                                >
+                                  {item.name}
+                                </div>
+                                <div
+                                  style={{
+                                    fontSize: '0.875rem',
+                                    color: 'var(--theme-elevation-600)',
+                                  }}
+                                >
+                                  {item.direction === 'out' ? '➡️ To' : '⬅️ From'}:{' '}
+                                  {item.otherAccountName || 'Unknown'}
+                                </div>
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: '1.125rem',
+                                  fontWeight: 'bold',
+                                  color:
+                                    item.direction === 'in'
+                                      ? 'var(--theme-success-500)'
+                                      : 'var(--theme-error-500)',
+                                }}
+                              >
+                                {item.direction === 'in' ? '+' : '-'}
+                                {formatCurrency(item.amount)}
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {projections.items.income.filter((i) => i.isActual).length === 0 &&
+                    projections.items.expenses.filter((i) => i.isActual).length === 0 &&
+                    projections.items.transfers.filter((i) => i.isActual).length === 0 && (
+                      <p style={{ color: 'var(--theme-elevation-600)', fontStyle: 'italic' }}>
+                        No transactions recorded in this budget period yet.
+                      </p>
+                    )}
+                </div>
+              </>
+            )}
+
             {/* Quick Actions */}
-            <div>
+            <div style={{ marginTop: 'var(--spacing-xxl)' }}>
               <h4
                 style={{
                   marginBottom: 'var(--spacing-m)',
@@ -390,16 +694,10 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
                   All Budgets
                 </Link>
                 <Link
-                  href="/admin/collections/accounts"
+                  href="/admin/collections/budget-schedules"
                   className="btn btn--style-secondary btn--size-small"
                 >
-                  Manage Accounts
-                </Link>
-                <Link
-                  href="/admin/collections/budgets/create"
-                  className="btn btn--style-primary btn--size-small"
-                >
-                  + Create Budget
+                  Manage Budget Automations
                 </Link>
               </div>
             </div>
@@ -417,13 +715,19 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
             <div style={{ fontSize: '3rem', marginBottom: 'var(--spacing-m)' }}>💼</div>
             <h2 style={{ marginBottom: 'var(--spacing-m)' }}>No Active Budget</h2>
             <p style={{ marginBottom: 'var(--spacing-l)', color: 'var(--theme-elevation-700)' }}>
-              This account doesn&apos;t have an active budget period yet.
+              This account has a budget automation configured, but no active budget yet.
             </p>
-            <Link
-              href={`/admin/collections/budgets/create?account=${currentAccount.id}`}
-              className="btn btn--style-primary"
+            <p
+              style={{
+                marginBottom: 'var(--spacing-l)',
+                color: 'var(--theme-elevation-700)',
+                fontSize: '0.875rem',
+              }}
             >
-              Create Budget for {currentAccount.name}
+              The automation will create budgets automatically when needed.
+            </p>
+            <Link href="/admin/collections/budget-schedules" className="btn btn--style-secondary">
+              Manage Budget Automations
             </Link>
           </div>
         )}

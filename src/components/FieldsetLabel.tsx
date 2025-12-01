@@ -65,3 +65,25 @@ export const ScheduleDetailsLabel = () => {
     </div>
   )
 }
+
+export const BudgetScheduleLabel = () => {
+  return (
+    <div
+      style={{
+        marginTop: '1.5rem',
+        marginBottom: '1rem',
+      }}
+    >
+      <h3
+        style={{
+          margin: 0,
+          fontSize: '1.125rem',
+          fontWeight: 600,
+          color: 'var(--theme-elevation-1000)',
+        }}
+      >
+        Budget Period Schedule
+      </h3>
+    </div>
+  )
+}

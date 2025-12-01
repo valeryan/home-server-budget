@@ -7,7 +7,9 @@ import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { Accounts } from './collections/Accounts'
+import { BudgetItems } from './collections/BudgetItems'
 import { Budgets } from './collections/BudgetPeriods'
+import { BudgetSchedules } from './collections/BudgetSchedules'
 import { ExpenseCategories } from './collections/ExpenseCategories'
 import { IncomeCategories } from './collections/IncomeCategories'
 import { Media } from './collections/Media'
@@ -46,6 +48,8 @@ export default buildConfig({
     Transactions,
     RecurringItems,
     Budgets,
+    BudgetItems,
+    BudgetSchedules,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
