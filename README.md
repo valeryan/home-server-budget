@@ -6,11 +6,10 @@ A Payload CMS-based budget management application designed to replace spreadshee
 
 This application helps you manage your home budget by creating budget periods that align with your paycheck schedule. It features:
 
-- **Template-based budgeting**: Define recurring income, expenses, and transfers once
+- **Use Relationships**: Relational data model on top of MongoDB
 - **Period-based tracking**: Create a new budget for each paycheck cycle
 - **Multiple accounts**: Track checking, savings, credit cards, etc.
 - **Planned vs Actual**: Compare budgeted amounts with actual spending
-- **MongoDB-optimized**: Document-oriented design for efficient queries
 
 ## Documentation
 
@@ -30,17 +29,14 @@ The application includes the following collections:
 - **Payees**: People and companies you receive money from or pay to
 - **Accounts**: Your financial accounts (checking, savings, credit cards, etc.)
 
-### Template Collections
-- **Income Templates**: Recurring income items (salary, side income, etc.)
-- **Expense Templates**: Recurring expenses (rent, utilities, subscriptions, etc.)
-- **Transfer Templates**: Recurring transfers between accounts
+### Templates (Recurring Items)
+- **RecurringItems**: Unified collection for all recurring income, expenses, and transfers that serve as your budget blueprints.
 
 ### Budget Management
-- **Budget Periods**: Individual budget cycles (one per paycheck)
-  - Embeds income, expense, and transfer items
-  - Tracks planned vs actual amounts
-  - Calculates summary totals
-- **Transactions**: Optional historical record of all financial movements
+- **Budget Periods**: Individual budget buckets (one per paycheck)
+  - References `BudgetItems` (does not embed them)
+- **Budget Items**: The actual instances of income/expenses for a specific period.
+- **Transactions**: Historical record of all financial movements (updates logical balances).
 
 ## Quick Start - Local Setup
 
@@ -85,10 +81,10 @@ This budget system is designed around a template-based workflow:
 
 ### Key Design Principles
 
-- **Document-oriented**: Budget periods are self-contained MongoDB documents
-- **Template-based**: Recurring items are defined once and copied to each period
+- **Relational**: Budget periods are linked to items, allowing independent management
+- **Template-based**: Recurring items are defined once and instantiated as BudgetItems
 - **Flexible**: Easy to add one-time items or adjust amounts per period
-- **Historical**: Past budget periods preserve data even if templates change
+- **Historical**: Past budget periods preserve data via the separate BudgetItems collection
 
 ### Collections
 

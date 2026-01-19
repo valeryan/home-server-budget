@@ -147,6 +147,85 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({ automations })
     })
   }
 
+  const renderTransactionTable = (
+    title: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    items: any[],
+    type: 'income' | 'expense' | 'transfer'
+  ) => {
+    if (items.length === 0) return null
+
+    return (
+      <div style={{ marginBottom: 'var(--spacing-xl)' }}>
+        <h4 style={{ marginBottom: 'var(--spacing-s)' }}>
+          {title} <span style={{ color: 'var(--theme-elevation-400)', fontWeight: 'normal' }}>({items.length})</span>
+        </h4>
+        <div style={{
+          background: 'var(--theme-elevation-0)',
+          border: '1px solid var(--theme-elevation-100)',
+          borderRadius: 'var(--border-radius)',
+          overflow: 'hidden'
+        }}>
+          <table cellPadding="0" cellSpacing="0" style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{
+                borderBottom: '1px solid var(--theme-elevation-100)',
+                background: 'var(--theme-elevation-50)',
+                fontSize: '0.75rem',
+                textTransform: 'uppercase',
+                textAlign: 'left'
+              }}>
+                <th style={{ padding: '12px 16px', fontWeight: '600', color: 'var(--theme-elevation-500)' }}>Name</th>
+                <th style={{ padding: '12px 16px', fontWeight: '600', color: 'var(--theme-elevation-500)' }}>Details</th>
+                <th style={{ padding: '12px 16px', fontWeight: '600', color: 'var(--theme-elevation-500)', textAlign: 'right' }}>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map(item => {
+                const isTransfer = 'direction' in item
+                const isIncome = type === 'income' || (isTransfer && item.direction === 'in')
+
+                return (
+                    <tr key={item.id} style={{ borderBottom: '1px solid var(--theme-elevation-100)' }}>
+                      <td style={{ padding: '12px 16px', fontWeight: '500' }}>{item.name}</td>
+                      <td style={{ padding: '12px 16px', color: 'var(--theme-elevation-600)', fontSize: '0.875rem' }}>
+                         {!isTransfer ? (
+                          <>
+                            {item.categoryName && (
+                              <span style={{
+                                display: 'inline-block',
+                                background: 'var(--theme-elevation-100)',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                marginRight: '8px',
+                                fontSize: '0.75rem'
+                              }}>
+                                📁 {item.categoryName}
+                              </span>
+                            )}
+                            {item.payeeName && (
+                              <span>👤 {item.payeeName}</span>
+                            )}
+                          </>
+                        ) : (
+                          <span>
+                            {item.direction === 'out' ? '➡️ To' : '⬅️ From'}: {item.otherAccountName || 'Unknown'}
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ padding: '12px 16px', textAlign: 'right', fontWeight: '500', color: isIncome ? 'var(--theme-success-500)' : 'var(--theme-error-500)' }}>
+                        {isIncome ? '+' : '-'}{formatCurrency(item.amount)}
+                      </td>
+                    </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
+  }
+
   if (automations.length === 0) {
     return (
       <Gutter>
@@ -415,7 +494,7 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({ automations })
               )}
             </div>
 
-            {/* Budget Items */}
+                {/* Budget Items */}
             {projections && projections.items && (
               <>
                 <BudgetItemsList
@@ -425,6 +504,8 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({ automations })
                   budgetId={activeBudget.id}
                   accountId={currentAccount.id}
                   onRefresh={fetchActiveBudget}
+                  startDate={activeBudget.startDate}
+                  endDate={activeBudget.endDate}
                 />
 
                 {/* Transactions in this budget period */}
@@ -441,221 +522,26 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({ automations })
                     Transactions in Period
                   </h4>
 
-                  {/* Income Transactions */}
-                  {projections.items.income.filter((i) => i.isActual).length > 0 && (
-                    <div style={{ marginBottom: 'var(--spacing-l)' }}>
-                      <h5
-                        style={{
-                          marginBottom: 'var(--spacing-s)',
-                          fontSize: '0.875rem',
-                          fontWeight: '600',
-                          color: 'var(--theme-success-500)',
-                        }}
-                      >
-                        Income
-                      </h5>
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: 'var(--spacing-s)',
-                        }}
-                      >
-                        {projections.items.income
-                          .filter((i) => i.isActual)
-                          .map((item) => (
-                            <div
-                              key={item.id}
-                              style={{
-                                background: 'var(--theme-elevation-0)',
-                                border: '1px solid var(--theme-elevation-150)',
-                                borderRadius: 'var(--border-radius)',
-                                padding: 'var(--spacing-m)',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                              }}
-                            >
-                              <div style={{ flex: 1 }}>
-                                <div
-                                  style={{ fontWeight: '600', marginBottom: 'var(--spacing-xs)' }}
-                                >
-                                  {item.name}
-                                </div>
-                                <div
-                                  style={{
-                                    fontSize: '0.875rem',
-                                    color: 'var(--theme-elevation-600)',
-                                  }}
-                                >
-                                  {item.categoryName && (
-                                    <span style={{ marginRight: 'var(--spacing-s)' }}>
-                                      📁 {item.categoryName}
-                                    </span>
-                                  )}
-                                  {item.payeeName && <span>👤 {item.payeeName}</span>}
-                                </div>
-                              </div>
-                              <div
-                                style={{
-                                  fontSize: '1.125rem',
-                                  fontWeight: 'bold',
-                                  color: 'var(--theme-success-500)',
-                                }}
-                              >
-                                +{formatCurrency(item.amount)}
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Expense Transactions */}
-                  {projections.items.expenses.filter((i) => i.isActual).length > 0 && (
-                    <div style={{ marginBottom: 'var(--spacing-l)' }}>
-                      <h5
-                        style={{
-                          marginBottom: 'var(--spacing-s)',
-                          fontSize: '0.875rem',
-                          fontWeight: '600',
-                          color: 'var(--theme-error-500)',
-                        }}
-                      >
-                        Expenses
-                      </h5>
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: 'var(--spacing-s)',
-                        }}
-                      >
-                        {projections.items.expenses
-                          .filter((i) => i.isActual)
-                          .map((item) => (
-                            <div
-                              key={item.id}
-                              style={{
-                                background: 'var(--theme-elevation-0)',
-                                border: '1px solid var(--theme-elevation-150)',
-                                borderRadius: 'var(--border-radius)',
-                                padding: 'var(--spacing-m)',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                              }}
-                            >
-                              <div style={{ flex: 1 }}>
-                                <div
-                                  style={{ fontWeight: '600', marginBottom: 'var(--spacing-xs)' }}
-                                >
-                                  {item.name}
-                                </div>
-                                <div
-                                  style={{
-                                    fontSize: '0.875rem',
-                                    color: 'var(--theme-elevation-600)',
-                                  }}
-                                >
-                                  {item.categoryName && (
-                                    <span style={{ marginRight: 'var(--spacing-s)' }}>
-                                      📁 {item.categoryName}
-                                    </span>
-                                  )}
-                                  {item.payeeName && <span>👤 {item.payeeName}</span>}
-                                </div>
-                              </div>
-                              <div
-                                style={{
-                                  fontSize: '1.125rem',
-                                  fontWeight: 'bold',
-                                  color: 'var(--theme-error-500)',
-                                }}
-                              >
-                                -{formatCurrency(item.amount)}
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Transfer Transactions */}
-                  {projections.items.transfers.filter((i) => i.isActual).length > 0 && (
-                    <div style={{ marginBottom: 'var(--spacing-l)' }}>
-                      <h5
-                        style={{
-                          marginBottom: 'var(--spacing-s)',
-                          fontSize: '0.875rem',
-                          fontWeight: '600',
-                        }}
-                      >
-                        Transfers
-                      </h5>
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: 'var(--spacing-s)',
-                        }}
-                      >
-                        {projections.items.transfers
-                          .filter((i) => i.isActual)
-                          .map((item) => (
-                            <div
-                              key={item.id}
-                              style={{
-                                background: 'var(--theme-elevation-0)',
-                                border: '1px solid var(--theme-elevation-150)',
-                                borderRadius: 'var(--border-radius)',
-                                padding: 'var(--spacing-m)',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                              }}
-                            >
-                              <div style={{ flex: 1 }}>
-                                <div
-                                  style={{ fontWeight: '600', marginBottom: 'var(--spacing-xs)' }}
-                                >
-                                  {item.name}
-                                </div>
-                                <div
-                                  style={{
-                                    fontSize: '0.875rem',
-                                    color: 'var(--theme-elevation-600)',
-                                  }}
-                                >
-                                  {item.direction === 'out' ? '➡️ To' : '⬅️ From'}:{' '}
-                                  {item.otherAccountName || 'Unknown'}
-                                </div>
-                              </div>
-                              <div
-                                style={{
-                                  fontSize: '1.125rem',
-                                  fontWeight: 'bold',
-                                  color:
-                                    item.direction === 'in'
-                                      ? 'var(--theme-success-500)'
-                                      : 'var(--theme-error-500)',
-                                }}
-                              >
-                                {item.direction === 'in' ? '+' : '-'}
-                                {formatCurrency(item.amount)}
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  )}
+                  {renderTransactionTable('Income', projections.items.income.filter(i => i.isActual), 'income')}
+                  {renderTransactionTable('Expenses', projections.items.expenses.filter(i => i.isActual), 'expense')}
+                  {renderTransactionTable('Transfers', projections.items.transfers.filter(i => i.isActual), 'transfer')}
 
                   {projections.items.income.filter((i) => i.isActual).length === 0 &&
                     projections.items.expenses.filter((i) => i.isActual).length === 0 &&
                     projections.items.transfers.filter((i) => i.isActual).length === 0 && (
-                      <p style={{ color: 'var(--theme-elevation-600)', fontStyle: 'italic' }}>
-                        No transactions recorded in this budget period yet.
-                      </p>
+                      <div
+                        style={{
+                          padding: 'var(--spacing-xl)',
+                          textAlign: 'center',
+                          color: 'var(--theme-elevation-600)',
+                          fontStyle: 'italic',
+                          background: 'var(--theme-elevation-0)',
+                          borderRadius: 'var(--border-radius)',
+                          border: '1px solid var(--theme-elevation-100)',
+                        }}
+                      >
+                       No transactions recorded in this budget period yet.
+                      </div>
                     )}
                 </div>
               </>
