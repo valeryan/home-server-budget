@@ -78,6 +78,7 @@ export interface Config {
     budgets: Budget;
     'budget-items': BudgetItem;
     'budget-schedules': BudgetSchedule;
+    'app-settings': AppSetting;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -96,6 +97,7 @@ export interface Config {
     budgets: BudgetsSelect<false> | BudgetsSelect<true>;
     'budget-items': BudgetItemsSelect<false> | BudgetItemsSelect<true>;
     'budget-schedules': BudgetSchedulesSelect<false> | BudgetSchedulesSelect<true>;
+    'app-settings': AppSettingsSelect<false> | AppSettingsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -140,10 +142,6 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: string;
-  /**
-   * The default account to show on your dashboard
-   */
-  defaultAccount?: (string | null) | Account;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -161,6 +159,64 @@ export interface User {
       }[]
     | null;
   password?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: string;
+  alt: string;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * ✅ Auto-seeded • Income categories (edit or add more as needed)
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "income-categories".
+ */
+export interface IncomeCategory {
+  id: string;
+  name: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * ✅ Auto-seeded • Expense categories (edit or add more as needed)
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "expense-categories".
+ */
+export interface ExpenseCategory {
+  id: string;
+  name: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * People and companies you transact with
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payees".
+ */
+export interface Payee {
+  id: string;
+  name: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * Bank accounts, credit cards, and cash accounts
@@ -248,64 +304,6 @@ export interface Account {
    * Which month does this occur?
    */
   month?: ('1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12') | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: string;
-  alt: string;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-}
-/**
- * ✅ Auto-seeded • Income categories (edit or add more as needed)
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "income-categories".
- */
-export interface IncomeCategory {
-  id: string;
-  name: string;
-  description?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * ✅ Auto-seeded • Expense categories (edit or add more as needed)
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "expense-categories".
- */
-export interface ExpenseCategory {
-  id: string;
-  name: string;
-  description?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * People and companies you transact with
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "payees".
- */
-export interface Payee {
-  id: string;
-  name: string;
-  description?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -646,6 +644,19 @@ export interface BudgetSchedule {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "app-settings".
+ */
+export interface AppSetting {
+  id: string;
+  /**
+   * Marks whether the initial setup wizard has been completed.
+   */
+  wizardComplete?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -711,6 +722,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'budget-schedules';
         value: string | BudgetSchedule;
+      } | null)
+    | ({
+        relationTo: 'app-settings';
+        value: string | AppSetting;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -759,7 +774,6 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
-  defaultAccount?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -952,6 +966,15 @@ export interface BudgetSchedulesSelect<T extends boolean = true> {
   budgetNamePattern?: T;
   isActive?: T;
   lookAhead?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "app-settings_select".
+ */
+export interface AppSettingsSelect<T extends boolean = true> {
+  wizardComplete?: T;
   updatedAt?: T;
   createdAt?: T;
 }

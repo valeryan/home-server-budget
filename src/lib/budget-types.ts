@@ -57,4 +57,9 @@ export interface BudgetProjection {
     expenses: BudgetItem[]
     transfers: TransferItem[]
   }
+  plannedItems: {
+    income: BudgetItem[]
+    expenses: BudgetItem[]
+    transfers: TransferItem[]
+  }
 }

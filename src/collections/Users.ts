@@ -9,13 +9,5 @@ export const Users: CollectionConfig = {
   auth: true,
   fields: [
     // Email added by default
-    {
-      name: 'defaultAccount',
-      type: 'relationship',
-      relationTo: 'accounts',
-      admin: {
-        description: 'The default account to show on your dashboard',
-      },
-    },
   ],
 }

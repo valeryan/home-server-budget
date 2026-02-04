@@ -5,24 +5,80 @@
 }
 
 .title {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   margin-top: 0;
 }
 
 .intro {
-  margin-bottom: 2rem;
-  color: var(--theme-elevation-800);
+  margin-bottom: 1rem;
+  color: var(--theme-elevation-700);
   font-size: 1rem;
   line-height: 1.6;
 }
 
-// Section styling
-.section {
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.stepDot {
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  border: 2px solid var(--theme-elevation-300);
+  background: var(--theme-elevation-0);
+  color: var(--theme-elevation-600);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.stepActive {
+  border-color: var(--theme-success-500);
+  color: var(--theme-success-500);
+}
+
+.stepComplete {
+  background: var(--theme-success-500);
+  color: white;
+  border-color: var(--theme-success-500);
+}
+
+.stepIncomplete {
+  border-color: var(--theme-warning-500);
+  color: var(--theme-warning-600);
+}
+
+.stepLine {
+  flex: 1;
+  height: 2px;
+  background: var(--theme-elevation-200);
+}
+
+.stepLabels {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  font-size: 0.75rem;
+  color: var(--theme-elevation-600);
+}
+
+.stepLabelActive {
+  color: var(--theme-elevation-800);
+  font-weight: 600;
+}
+
+.stepPanel {
   margin-bottom: 2rem;
 }
 
 .sectionTitle {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   font-size: 1.25rem;
   font-weight: 600;
   margin-top: 0;
@@ -31,211 +87,206 @@
 .sectionDesc {
   margin-bottom: 1rem;
   color: var(--theme-elevation-700);
-  font-size: 1rem;
+  font-size: 0.95rem;
+}
+
+.twoColGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
 }
 
 .card {
   background: var(--theme-elevation-50);
   padding: 1.5rem;
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
   border: 1px solid var(--theme-elevation-150);
 }
 
-// Foundation Data specifics
-.completionText {
-  margin: 0 0 1rem 0;
-  font-weight: 500;
-  color: var(--theme-success-600);
+.cardHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
-.statsGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.listRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--theme-elevation-0);
+  border: 1px solid var(--theme-elevation-150);
+}
+
+.listActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.listMuted {
+  font-size: 0.75rem;
+  color: var(--theme-elevation-500);
+}
+
+.wizardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 1rem;
-  font-size: 0.875rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--theme-elevation-150);
 }
 
-.link {
-  color: var(--theme-success-500);
-  text-decoration: none;
-  font-weight: 500;
-
-  &:hover {
-    text-decoration: underline;
-  }
+.footerStatus {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
-.tip {
-  margin-top: 1rem;
-  margin-bottom: 0;
-  font-size: 0.875rem;
+.footerBadge {
+  font-size: 0.65rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid var(--theme-elevation-200);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.footerComplete {
+  background: var(--theme-success-100);
+  color: var(--theme-success-600);
+  border-color: var(--theme-success-300);
+}
+
+.footerIncomplete {
+  background: var(--theme-elevation-100);
   color: var(--theme-elevation-600);
 }
 
-.warningText {
-  margin: 0;
-  color: var(--theme-warning-500);
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+  overflow: auto;
 }
 
-// Completion Modal/Card
-.completionCard {
-  background: var(--theme-success-100);
-  color: var(--theme-success-900);
-  padding: 2rem;
-  border-radius: 0.25rem;
-  text-align: center;
-  border: 1px solid var(--theme-success-300);
-  margin-bottom: 2rem;
-}
-
-.completionEmoji {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-}
-
-.completionTitle {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.completionDesc {
-  margin: 0 0 1.5rem 0;
-  font-size: 1rem;
-}
-
-.nextButton {
-  display: inline-block;
-}
-
-// Help Grid
-.helpGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-}
-
-// Setup Step Component
-.stepCard {
+.modalCard {
+  background: var(--theme-elevation-0);
+  border-radius: 0.75rem;
+  border: 1px solid var(--theme-elevation-200);
+  width: min(720px, 100%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  max-height: none;
   padding: 1.5rem;
+  overflow: hidden;
+  margin: auto;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 1rem;
-  background: var(--theme-bg);
-  border-radius: 0.25rem;
-  border: 1px solid var(--theme-elevation-150);
-  border-left-width: 4px;
-  border-left-style: solid;
-  
-  &:last-child {
-    margin-bottom: 0;
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modalBody {
+  overflow: visible;
+  padding-right: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.formGridSingle {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.formSection {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--theme-elevation-150);
+}
+
+.formSection:last-of-type {
+  border-bottom: 0;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.formSectionTitle {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--theme-elevation-500);
+  margin: 0 0 0.75rem 0;
+  font-weight: 600;
+}
+
+@media (max-width: 720px) {
+  .modalCard {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formActions {
+    flex-direction: column-reverse;
+    align-items: stretch;
   }
 }
 
-.stepComplete {
-  border-left-color: var(--theme-success-500);
-}
-
-.stepIncomplete {
-  border-left-color: var(--theme-warning-500);
-}
-
-.stepContent {
+.formActions {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.stepBody {
-  flex: 1;
-}
-
-.stepHeader {
-  display: flex;
-  align-items: center;
+  justify-content: flex-end;
   gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
+  padding-top: 0.25rem;
 
-.stepBadge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  color: white;
-  font-size: 1rem;
-  font-weight: bold;
-}
-
-.badgeComplete {
-  background: var(--theme-success-500);
-}
-
-.badgeIncomplete {
-  background: var(--theme-warning-500);
-}
-
-.stepTitle {
-  margin: 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-}
-
-.requiredStar {
-  color: var(--theme-error-500);
-  margin-left: 0.25rem;
-  font-size: 0.875rem;
-}
-
-.stepDesc {
-  margin: 0;
-  margin-left: 44px;
-  color: var(--theme-elevation-700);
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
-
-.stepActions {
-  margin-left: 1.5rem;
-  text-align: right;
-}
-
-.stepCount {
-  font-size: 1.75rem;
-  font-weight: bold;
-  margin-bottom: 0.25rem;
-}
-
-.countComplete {
-  color: var(--theme-success-500);
-}
-
-.countIncomplete {
-  color: var(--theme-elevation-400);
-}
-
-// Resource Card
-.resourceCard {
-  background: var(--theme-elevation-50);
-  padding: 1.5rem;
-  border-radius: 0.25rem;
-  border: 1px solid var(--theme-elevation-150);
-}
-
-.resourceEmoji {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
-
-.resourceTitle {
-  margin: 0 0 0.25rem 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-}
-
-.resourceDesc {
-  margin: 0;
-  color: var(--theme-elevation-700);
-  font-size: 0.8125rem;
-  line-height: 1.5;
+  button {
+    padding: 0.625rem 1.25rem;
+  }
 }

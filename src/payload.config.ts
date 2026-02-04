@@ -7,6 +7,7 @@ import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { Accounts } from './collections/Accounts'
+import { AppSettings } from './collections/AppSettings'
 import { BudgetItems } from './collections/BudgetItems'
 import { Budgets } from './collections/BudgetPeriods'
 import { BudgetSchedules } from './collections/BudgetSchedules'
@@ -50,6 +51,7 @@ export default buildConfig({
     Budgets,
     BudgetItems,
     BudgetSchedules,
+    AppSettings,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

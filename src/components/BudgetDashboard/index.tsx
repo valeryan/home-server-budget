@@ -27,6 +27,7 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({ automations })
   const [dismissedStaleBudgetId, setDismissedStaleBudgetId] = useState<string | null>(null)
   const [autoAdvanceInProgress, setAutoAdvanceInProgress] = useState(false)
   const [finalizeInProgress, setFinalizeInProgress] = useState(false)
+  const [initialAutoAdvanceAttempted, setInitialAutoAdvanceAttempted] = useState(false)
 
   const currentAutomation = automations[currentAutomationIndex]
   const currentAccount = currentAutomation?.account
@@ -42,6 +43,29 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({ automations })
       const budgetDocs = data.docs || []
       setBudgets(budgetDocs)
 
+      if (budgetDocs.length === 0 && !initialAutoAdvanceAttempted) {
+        setInitialAutoAdvanceAttempted(true)
+        try {
+          await fetch(`/api/budget-auto-advance?account=${currentAccount.id}`)
+          const retryResponse = await fetch(
+            `/api/budgets?where[account][equals]=${currentAccount.id}&sort=startDate&limit=100`,
+          )
+          const retryData = await retryResponse.json()
+          const retryDocs = retryData.docs || []
+          setBudgets(retryDocs)
+
+          const active = retryDocs.find((b: Budget) => b.status === 'active')
+          if (active) {
+            setSelectedBudgetId(active.id)
+          } else if (retryDocs.length > 0) {
+            setSelectedBudgetId(retryDocs[retryDocs.length - 1].id)
+          }
+          return
+        } catch (error) {
+          console.error('Error auto-creating initial budgets:', error)
+        }
+      }
+
       if (!selectedBudgetId) {
         const active = budgetDocs.find((b: Budget) => b.status === 'active')
         if (active) {
@@ -53,7 +77,7 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({ automations })
     } catch (error) {
       console.error('Error fetching budgets:', error)
     }
-  }, [currentAccount, selectedBudgetId])
+  }, [currentAccount, initialAutoAdvanceAttempted, selectedBudgetId])
 
   const fetchSelectedBudget = useCallback(
     async (options?: { autoAdvance?: boolean }) => {
@@ -126,6 +150,7 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({ automations })
     setSelectedBudgetId(null)
     setSelectedBudget(null)
     setBudgets([])
+    setInitialAutoAdvanceAttempted(false)
   }, [currentAccount?.id])
 
   const handleProceedAutoAdvance = async () => {
@@ -337,9 +362,11 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({ automations })
                                 {formatDate(selectedBudget.startDate)} — {formatDate(selectedBudget.endDate)}
                              </span>
                         </h3>
-                        <CategorySummary 
-                            incomeItems={projections.items.income} 
-                            expenseItems={projections.items.expenses} 
+                        <CategorySummary
+                          plannedIncomeItems={projections.plannedItems?.income || []}
+                          plannedExpenseItems={projections.plannedItems?.expenses || []}
+                          actualIncomeItems={projections.items.income.filter((i) => i.isActual)}
+                          actualExpenseItems={projections.items.expenses.filter((i) => i.isActual)}
                         />
                      </div>
 

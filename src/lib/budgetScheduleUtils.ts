@@ -216,9 +216,10 @@ export async function autoAdvanceBudgets(
 
   const updatedDocs = updatedBudgets.docs as unknown as Budget[]
   const planningBudgets = updatedDocs.filter((b) => b.status === 'planning')
+  const hasActiveBudget = updatedDocs.some((b) => b.status === 'active')
 
-  // Create new planning budgets if we need moree
-  const neededBudgets = schedule.lookAhead - planningBudgets.length
+  // Ensure we always have one current active budget, plus lookAhead planned budgets
+  const neededBudgets = schedule.lookAhead - planningBudgets.length + (hasActiveBudget ? 0 : 1)
 
   if (neededBudgets > 0) {
     // Find the last budget to calculate from
@@ -261,18 +262,31 @@ export async function autoAdvanceBudgets(
 
       const name = formatBudgetName(schedule.budgetNamePattern, startDate, endDate)
 
-      await payload.create({
+      const existing = await payload.find({
         collection: 'budgets',
-        data: {
-          name,
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString(),
-          status: startDate <= now ? 'active' : 'planning',
-          account: accountId,
+        where: {
+          account: { equals: accountId },
+          startDate: { equals: startDate.toISOString() },
+          endDate: { equals: endDate.toISOString() },
         },
+        limit: 1,
       })
 
-      created++
+      if (existing.docs.length === 0) {
+        await payload.create({
+          collection: 'budgets',
+          data: {
+            name,
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
+            status: startDate <= now ? 'active' : 'planning',
+            account: accountId,
+          },
+        })
+
+        created++
+      }
+
       lastEndDate = endDate
     }
   }

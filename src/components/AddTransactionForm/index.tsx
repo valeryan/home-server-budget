@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { Modal } from '../Modal'
 import styles from './styles.module.scss'
 
 interface AddTransactionFormProps {
@@ -108,12 +109,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ accountI
   const today = new Date().toISOString().split('T')[0]
 
   return (
-    <div className={styles.modalOverlay} onClick={onCancel}>
-      <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
-      <div className={styles.modalHeader}>
-        <h3 className={styles.title}>Add Transaction</h3>
-        <button className={styles.modalClose} onClick={onCancel}>×</button>
-      </div>
+    <Modal title="Add Transaction" onClose={onCancel} size="lg">
       
       {loadingOptions && (
          <div className={styles.loadingText}>Loading options...</div>
@@ -377,7 +373,6 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ accountI
           </button>
         </div>
       </form>
-    </div>
-    </div>
+    </Modal>
   )
 }

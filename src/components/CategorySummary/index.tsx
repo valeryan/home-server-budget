@@ -4,8 +4,10 @@ import { formatCurrency } from '@/lib/formatting'
 import styles from './styles.module.scss'
 
 interface CategorySummaryProps {
-  incomeItems: BudgetItem[]
-  expenseItems: BudgetItem[]
+  plannedIncomeItems: BudgetItem[]
+  plannedExpenseItems: BudgetItem[]
+  actualIncomeItems: BudgetItem[]
+  actualExpenseItems: BudgetItem[]
 }
 
 interface CategoryRow {
@@ -15,32 +17,43 @@ interface CategoryRow {
   items: BudgetItem[]
 }
 
-export const CategorySummary: React.FC<CategorySummaryProps> = ({ incomeItems, expenseItems }) => {
-  // Helper to aggregate items by category
-  const aggregateByCategory = (items: BudgetItem[]): CategoryRow[] => {
+export const CategorySummary: React.FC<CategorySummaryProps> = ({
+  plannedIncomeItems,
+  plannedExpenseItems,
+  actualIncomeItems,
+  actualExpenseItems,
+}) => {
+  const aggregateByCategory = (
+    plannedItems: BudgetItem[],
+    actualItems: BudgetItem[],
+  ): CategoryRow[] => {
     const map = new Map<string, CategoryRow>()
 
-    // Initialize with "Uncategorized" if needed or just handle empty category names
-    items.forEach(item => {
+    plannedItems.forEach((item) => {
       const catName = item.categoryName || 'Uncategorized'
       if (!map.has(catName)) {
         map.set(catName, { name: catName, planned: 0, actual: 0, items: [] })
       }
       const row = map.get(catName)!
-      
-      if (item.isActual) {
-        row.actual += item.amount
-      } else {
-        row.planned += item.amount
+      row.planned += item.amount
+      row.items.push(item)
+    })
+
+    actualItems.forEach((item) => {
+      const catName = item.categoryName || 'Uncategorized'
+      if (!map.has(catName)) {
+        map.set(catName, { name: catName, planned: 0, actual: 0, items: [] })
       }
+      const row = map.get(catName)!
+      row.actual += item.amount
       row.items.push(item)
     })
 
     return Array.from(map.values()).sort((a, b) => b.actual - a.actual) // Sort by highest actual spend
   }
 
-  const incomeCategories = aggregateByCategory(incomeItems)
-  const expenseCategories = aggregateByCategory(expenseItems)
+  const incomeCategories = aggregateByCategory(plannedIncomeItems, actualIncomeItems)
+  const expenseCategories = aggregateByCategory(plannedExpenseItems, actualExpenseItems)
 
   const renderCategoryTable = (title: string, categories: CategoryRow[], isIncome: boolean) => (
     <div className={styles.section}>

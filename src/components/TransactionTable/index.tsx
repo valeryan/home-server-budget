@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { BudgetItem, TransferItem, TransactionItem } from '@/lib/budget-types'
 import { formatCurrency } from '@/lib/formatting'
+import { Modal } from '../Modal'
 import styles from './styles.module.scss'
 
 interface TransactionTableProps {
@@ -215,21 +216,21 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({ title, items
           category: categoryId,
           payee: payeeId,
         }
-        payload.expenseDetails = null
-        payload.transferDetails = null
+        payload.expenseDetails = {}
+        payload.transferDetails = {}
       } else if (editForm.type === 'expense') {
         payload.expenseDetails = {
           category: categoryId,
           payee: payeeId,
         }
-        payload.incomeDetails = null
-        payload.transferDetails = null
+        payload.incomeDetails = {}
+        payload.transferDetails = {}
       } else if (editForm.type === 'transfer') {
         payload.transferDetails = {
           toAccount: editForm.toAccountId,
         }
-        payload.incomeDetails = null
-        payload.expenseDetails = null
+        payload.incomeDetails = {}
+        payload.expenseDetails = {}
       }
 
       const res = await fetch(`/api/transactions/${editingTransaction.id}`, {
@@ -343,208 +344,201 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({ title, items
       </div>
 
       {editingTransaction && (
-        <div className={styles.modalOverlay} onClick={closeModal}>
-          <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>Edit Transaction</h3>
-              <button className={styles.modalClose} onClick={closeModal}>×</button>
-            </div>
-
-            {isLoading ? (
-              <div className={styles.modalBody}>Loading...</div>
-            ) : (
-              <div className={styles.modalBody}>
-                {editForm && (
-                  <>
-                    <div className={styles.modalGrid}>
-                      <div className="field-type date">
-                        <label className="field-label">Date</label>
-                        <input
-                          className="field-input"
-                          type="date"
-                          value={editForm.date}
-                          onChange={(e) =>
-                            setEditForm((prev) => (prev ? { ...prev, date: e.target.value } : prev))
-                          }
-                        />
-                      </div>
-                      <div className="field-type text">
-                        <label className="field-label">Type</label>
-                        <input className="field-input" type="text" value={editForm.type} readOnly />
-                      </div>
+        <Modal title="Edit Transaction" onClose={closeModal} size="lg" bodyClassName={styles.modalBody}>
+          {isLoading ? (
+            <div>Loading...</div>
+          ) : (
+            <>
+              {editForm && (
+                <>
+                  <div className={styles.modalGrid}>
+                    <div className="field-type date">
+                      <label className="field-label">Date</label>
+                      <input
+                        className="field-input"
+                        type="date"
+                        value={editForm.date}
+                        onChange={(e) =>
+                          setEditForm((prev) => (prev ? { ...prev, date: e.target.value } : prev))
+                        }
+                      />
                     </div>
+                    <div className="field-type text">
+                      <label className="field-label">Type</label>
+                      <input className="field-input" type="text" value={editForm.type} readOnly />
+                    </div>
+                  </div>
 
+                  <div className={styles.modalGrid}>
+                    <div className="field-type text">
+                      <label className="field-label">Description</label>
+                      <input
+                        className="field-input"
+                        type="text"
+                        value={editForm.description}
+                        onChange={(e) =>
+                          setEditForm((prev) =>
+                            prev ? { ...prev, description: e.target.value } : prev,
+                          )
+                        }
+                      />
+                    </div>
+                    <div className="field-type number">
+                      <label className="field-label">Amount</label>
+                      <input
+                        className="field-input"
+                        type="number"
+                        step="0.01"
+                        value={editForm.amount}
+                        onChange={(e) =>
+                          setEditForm((prev) => (prev ? { ...prev, amount: e.target.value } : prev))
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  {editForm.type !== 'transfer' && (
                     <div className={styles.modalGrid}>
                       <div className="field-type text">
-                        <label className="field-label">Description</label>
+                        <label className="field-label">Category</label>
                         <input
                           className="field-input"
                           type="text"
-                          value={editForm.description}
+                          name="categoryName"
+                          placeholder="Select or type new..."
+                          autoComplete="off"
+                          value={editForm.categoryName}
                           onChange={(e) =>
                             setEditForm((prev) =>
-                              prev ? { ...prev, description: e.target.value } : prev,
+                              prev ? { ...prev, categoryName: e.target.value } : prev,
                             )
                           }
                         />
-                      </div>
-                      <div className="field-type number">
-                        <label className="field-label">Amount</label>
-                        <input
-                          className="field-input"
-                          type="number"
-                          step="0.01"
-                          value={editForm.amount}
-                          onChange={(e) =>
-                            setEditForm((prev) => (prev ? { ...prev, amount: e.target.value } : prev))
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    {editForm.type !== 'transfer' && (
-                      <div className={styles.modalGrid}>
-                        <div className="field-type text">
-                          <label className="field-label">Category</label>
-                          <input
-                            className="field-input"
-                            type="text"
-                            name="categoryName"
-                            placeholder="Select or type new..."
-                            autoComplete="off"
-                            value={editForm.categoryName}
-                            onChange={(e) =>
-                              setEditForm((prev) =>
-                                prev ? { ...prev, categoryName: e.target.value } : prev,
-                              )
-                            }
-                          />
-                          <div className={styles.inlineSelect}>
-                            <label className={styles.inlineLabel}>Pick existing</label>
-                            <div className="select-container">
-                              <select
-                                className="field-input"
-                                value=""
-                                onChange={(e) =>
-                                  setEditForm((prev) =>
-                                    prev ? { ...prev, categoryName: e.target.value } : prev,
-                                  )
-                                }
-                              >
-                                <option value="">Select...</option>
-                                {(editForm.type === 'income' ? incomeCategories : expenseCategories).map((cat) => (
-                                  <option key={cat.id} value={cat.name}>{cat.name}</option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="field-type text">
-                          <label className="field-label">Payee</label>
-                          <input
-                            className="field-input"
-                            type="text"
-                            name="payeeName"
-                            placeholder="Select or type new..."
-                            autoComplete="off"
-                            value={editForm.payeeName}
-                            onChange={(e) =>
-                              setEditForm((prev) =>
-                                prev ? { ...prev, payeeName: e.target.value } : prev,
-                              )
-                            }
-                          />
-                          <div className={styles.inlineSelect}>
-                            <label className={styles.inlineLabel}>Pick existing</label>
-                            <div className="select-container">
-                              <select
-                                className="field-input"
-                                value=""
-                                onChange={(e) =>
-                                  setEditForm((prev) =>
-                                    prev ? { ...prev, payeeName: e.target.value } : prev,
-                                  )
-                                }
-                              >
-                                <option value="">Select...</option>
-                                {payees.map((payee) => (
-                                  <option key={payee.id} value={payee.name}>{payee.name}</option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {editForm.type === 'transfer' && (
-                      <div className={styles.modalGrid}>
-                        <div className="field-type select">
-                          <label className="field-label">To Account</label>
+                        <div className={styles.inlineSelect}>
+                          <label className={styles.inlineLabel}>Pick existing</label>
                           <div className="select-container">
                             <select
                               className="field-input"
-                              value={editForm.toAccountId}
+                              value=""
                               onChange={(e) =>
                                 setEditForm((prev) =>
-                                  prev ? { ...prev, toAccountId: e.target.value } : prev,
+                                  prev ? { ...prev, categoryName: e.target.value } : prev,
                                 )
                               }
                             >
-                              <option value="">Select destination...</option>
-                              {accounts
-                                .filter((acct) => {
-                                  const fromAccountId = editingTransaction
-                                    ? getAccountId(editingTransaction.account)
-                                    : ''
-                                  return acct.id !== fromAccountId
-                                })
-                                .map((acct) => (
-                                  <option key={acct.id} value={acct.id}>
-                                    {acct.name}
-                                  </option>
-                                ))}
+                              <option value="">Select...</option>
+                              {(editForm.type === 'income' ? incomeCategories : expenseCategories).map((cat) => (
+                                <option key={cat.id} value={cat.name}>{cat.name}</option>
+                              ))}
                             </select>
                           </div>
                         </div>
                       </div>
-                    )}
-
-                    <div className={styles.modalGrid}>
-                      <div className="field-type textarea">
-                        <label className="field-label">Notes</label>
-                        <textarea
+                      <div className="field-type text">
+                        <label className="field-label">Payee</label>
+                        <input
                           className="field-input"
-                          rows={3}
-                          value={editForm.notes}
+                          type="text"
+                          name="payeeName"
+                          placeholder="Select or type new..."
+                          autoComplete="off"
+                          value={editForm.payeeName}
                           onChange={(e) =>
-                            setEditForm((prev) => (prev ? { ...prev, notes: e.target.value } : prev))
+                            setEditForm((prev) =>
+                              prev ? { ...prev, payeeName: e.target.value } : prev,
+                            )
                           }
                         />
+                        <div className={styles.inlineSelect}>
+                          <label className={styles.inlineLabel}>Pick existing</label>
+                          <div className="select-container">
+                            <select
+                              className="field-input"
+                              value=""
+                              onChange={(e) =>
+                                setEditForm((prev) =>
+                                  prev ? { ...prev, payeeName: e.target.value } : prev,
+                                )
+                              }
+                            >
+                              <option value="">Select...</option>
+                              {payees.map((payee) => (
+                                <option key={payee.id} value={payee.name}>{payee.name}</option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </>
-                )}
-              </div>
-            )}
+                  )}
 
-            <div className={styles.modalActions}>
-              <button className="btn btn--style-secondary" onClick={closeModal} disabled={isSaving || isDeleting}>
-                Cancel
-              </button>
-              <button
-                className="btn btn--style-secondary"
-                onClick={() => handleDelete(editingTransaction.id)}
-                disabled={isSaving || isDeleting}
-              >
-                {isDeleting ? 'Deleting...' : 'Delete'}
-              </button>
-              <button className="btn btn--style-primary" onClick={handleSave} disabled={isSaving || isDeleting}>
-                {isSaving ? 'Saving...' : 'Save Changes'}
-              </button>
-            </div>
+                  {editForm.type === 'transfer' && (
+                    <div className={styles.modalGrid}>
+                      <div className="field-type select">
+                        <label className="field-label">To Account</label>
+                        <div className="select-container">
+                          <select
+                            className="field-input"
+                            value={editForm.toAccountId}
+                            onChange={(e) =>
+                              setEditForm((prev) =>
+                                prev ? { ...prev, toAccountId: e.target.value } : prev,
+                              )
+                            }
+                          >
+                            <option value="">Select destination...</option>
+                            {accounts
+                              .filter((acct) => {
+                                const fromAccountId = editingTransaction
+                                  ? getAccountId(editingTransaction.account)
+                                  : ''
+                                return acct.id !== fromAccountId
+                              })
+                              .map((acct) => (
+                                <option key={acct.id} value={acct.id}>
+                                  {acct.name}
+                                </option>
+                              ))}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className={styles.modalGrid}>
+                    <div className="field-type textarea">
+                      <label className="field-label">Notes</label>
+                      <textarea
+                        className="field-input"
+                        rows={3}
+                        value={editForm.notes}
+                        onChange={(e) =>
+                          setEditForm((prev) => (prev ? { ...prev, notes: e.target.value } : prev))
+                        }
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+
+          <div className={styles.modalActions}>
+            <button className="btn btn--style-secondary" onClick={closeModal} disabled={isSaving || isDeleting}>
+              Cancel
+            </button>
+            <button
+              className="btn btn--style-secondary"
+              onClick={() => handleDelete(editingTransaction.id)}
+              disabled={isSaving || isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </button>
+            <button className="btn btn--style-primary" onClick={handleSave} disabled={isSaving || isDeleting}>
+              {isSaving ? 'Saving...' : 'Save Changes'}
+            </button>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

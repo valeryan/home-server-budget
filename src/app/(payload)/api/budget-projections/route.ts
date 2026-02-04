@@ -178,6 +178,35 @@ export async function GET(request: NextRequest) {
       otherAccountName: string | null
       isActual?: boolean
     }> = []
+    const plannedIncomeItems: Array<{
+      id: string
+      name: string
+      amount: number
+      categoryId: string | null
+      categoryName: string | null
+      payeeId: string | null
+      payeeName: string | null
+      isActual?: boolean
+    }> = []
+    const plannedExpenseItems: Array<{
+      id: string
+      name: string
+      amount: number
+      categoryId: string | null
+      categoryName: string | null
+      payeeId: string | null
+      payeeName: string | null
+      isActual?: boolean
+    }> = []
+    const plannedTransferItems: Array<{
+      id: string
+      name: string
+      amount: number
+      direction: 'in' | 'out'
+      otherAccountId: string | null
+      otherAccountName: string | null
+      isActual?: boolean
+    }> = []
 
     // Add actual transactions to the totals
     transactions.docs.forEach((txn) => {
@@ -286,13 +315,8 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    // Calculate projections based on matching schedules (only unactualized recurring items)
+    // Calculate projections based on matching schedules (planned recurring items)
     recurringItems.docs.forEach((item) => {
-      // Skip items that have already been actualized
-      if (actualizedRecurringItemIds.has(item.id)) {
-        return
-      }
-
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const scheduleType = (item as any).scheduleType
       const schedule = getSchedule(scheduleType as string)
@@ -315,6 +339,28 @@ export async function GET(request: NextRequest) {
       const dueDate = firstOccurrence ? firstOccurrence.toISOString() : null
 
       if (item.itemType === 'income') {
+        plannedIncomeItems.push({
+          id: item.id,
+          name: item.name,
+          amount: item.amount,
+          categoryId:
+            typeof item.incomeCategory === 'object' && item.incomeCategory
+              ? item.incomeCategory.id
+              : item.incomeCategory || null,
+          categoryName:
+            typeof item.incomeCategory === 'object' && item.incomeCategory
+              ? item.incomeCategory.name
+              : null,
+          payeeId:
+            typeof item.payee === 'object' && item.payee ? item.payee.id : item.payee || null,
+          payeeName: typeof item.payee === 'object' && item.payee ? item.payee.name : null,
+          dueDate,
+          isActual: false,
+        })
+
+        if (actualizedRecurringItemIds.has(item.id)) {
+          return
+        }
         income += item.amount
         incomeCount++
         incomeItems.push({
@@ -336,6 +382,28 @@ export async function GET(request: NextRequest) {
           isActual: false,
         })
       } else if (item.itemType === 'expense') {
+        plannedExpenseItems.push({
+          id: item.id,
+          name: item.name,
+          amount: item.amount,
+          categoryId:
+            typeof item.expenseCategory === 'object' && item.expenseCategory
+              ? item.expenseCategory.id
+              : item.expenseCategory || null,
+          categoryName:
+            typeof item.expenseCategory === 'object' && item.expenseCategory
+              ? item.expenseCategory.name
+              : null,
+          payeeId:
+            typeof item.payee === 'object' && item.payee ? item.payee.id : item.payee || null,
+          payeeName: typeof item.payee === 'object' && item.payee ? item.payee.name : null,
+          dueDate,
+          isActual: false,
+        })
+
+        if (actualizedRecurringItemIds.has(item.id)) {
+          return
+        }
         expenses += item.amount
         expenseCount++
         expenseItems.push({
@@ -371,6 +439,25 @@ export async function GET(request: NextRequest) {
 
         if (fromAccountId === accountId) {
           // Money leaving this account
+          plannedTransferItems.push({
+            id: item.id,
+            name: item.name,
+            amount: item.amount,
+            direction: 'out',
+            otherAccountId: toAccountId,
+            otherAccountName:
+              typeof itemData.toAccount === 'object' &&
+              itemData.toAccount &&
+              'name' in itemData.toAccount
+                ? (itemData.toAccount as { name: string }).name
+                : null,
+            dueDate,
+            isActual: false,
+          })
+
+          if (actualizedRecurringItemIds.has(item.id)) {
+            return
+          }
           expenses += item.amount
           transferOutCount++
           transferItems.push({
@@ -391,6 +478,25 @@ export async function GET(request: NextRequest) {
         }
         if (toAccountId === accountId) {
           // Money coming into this account
+          plannedTransferItems.push({
+            id: item.id,
+            name: item.name,
+            amount: item.amount,
+            direction: 'in',
+            otherAccountId: fromAccountId,
+            otherAccountName:
+              typeof itemData.fromAccount === 'object' &&
+              itemData.fromAccount &&
+              'name' in itemData.fromAccount
+                ? (itemData.fromAccount as { name: string }).name
+                : null,
+            dueDate,
+            isActual: false,
+          })
+
+          if (actualizedRecurringItemIds.has(item.id)) {
+            return
+          }
           income += item.amount
           transferInCount++
           transferItems.push({
@@ -426,6 +532,11 @@ export async function GET(request: NextRequest) {
         income: incomeItems,
         expenses: expenseItems,
         transfers: transferItems,
+      },
+      plannedItems: {
+        income: plannedIncomeItems,
+        expenses: plannedExpenseItems,
+        transfers: plannedTransferItems,
       },
     })
   } catch (error) {

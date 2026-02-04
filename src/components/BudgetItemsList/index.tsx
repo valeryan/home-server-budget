@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { BudgetItem, TransferItem } from '@/lib/budget-types'
+import { Modal } from '../Modal'
 import styles from './styles.module.scss'
 
 interface BudgetItemsListProps {
@@ -247,85 +248,76 @@ export const BudgetItemsList: React.FC<BudgetItemsListProps> = ({
       )}
 
       {modalItem && (
-          <div className={styles.modalOverlay} onClick={() => setModalItemId(null)}>
-          <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>Record Transaction</h3>
-              <button className={styles.modalClose} onClick={() => setModalItemId(null)}>
-                ×
-              </button>
+        <Modal title="Record Transaction" onClose={() => setModalItemId(null)} size="md">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              const form = e.target as HTMLFormElement
+              const formData = {
+                date: (form.elements.namedItem('date') as HTMLInputElement).value,
+                amount: (form.elements.namedItem('amount') as HTMLInputElement).value,
+                notes: (form.elements.namedItem('notes') as HTMLTextAreaElement).value,
+              }
+              if (modalItemType) {
+                handleRecordTransaction(modalItem.id, modalItemType, modalItem, formData)
+              }
+              setModalItemId(null)
+            }}
+          >
+            <div className={styles.formGrid}>
+              <div className="field-type date">
+                <label className="field-label">Date</label>
+                <input
+                  className="field-input"
+                  type="date"
+                  name="date"
+                  defaultValue={
+                    modalItem.dueDate
+                      ? new Date(modalItem.dueDate).toISOString().split('T')[0]
+                      : new Date().toISOString().split('T')[0]
+                  }
+                  min={minDate}
+                  max={maxDate}
+                  required
+                />
+              </div>
+              <div className="field-type number">
+                <label className="field-label">Actual Amount</label>
+                <input
+                  className="field-input"
+                  type="number"
+                  name="amount"
+                  step="0.01"
+                  defaultValue={modalItem.amount}
+                  required
+                />
+              </div>
             </div>
 
-            <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                const form = e.target as HTMLFormElement
-                const formData = {
-                  date: (form.elements.namedItem('date') as HTMLInputElement).value,
-                  amount: (form.elements.namedItem('amount') as HTMLInputElement).value,
-                  notes: (form.elements.namedItem('notes') as HTMLTextAreaElement).value,
-                }
-                if (modalItemType) {
-                  handleRecordTransaction(modalItem.id, modalItemType, modalItem, formData)
-                }
-                setModalItemId(null)
-              }}
-            >
-              <div className={styles.formGrid}>
-                <div className="field-type date">
-                  <label className="field-label">Date</label>
-                  <input
-                    className="field-input"
-                    type="date"
-                    name="date"
-                    defaultValue={
-                      modalItem.dueDate
-                        ? new Date(modalItem.dueDate).toISOString().split('T')[0]
-                        : new Date().toISOString().split('T')[0]
-                    }
-                    min={minDate}
-                    max={maxDate}
-                    required
-                  />
-                </div>
-                <div className="field-type number">
-                  <label className="field-label">Actual Amount</label>
-                  <input
-                    className="field-input"
-                    type="number"
-                    name="amount"
-                    step="0.01"
-                    defaultValue={modalItem.amount}
-                    required
-                  />
-                </div>
-              </div>
+            <div className="field-type textarea" style={{ marginBottom: '1.5rem' }}>
+              <label className="field-label">Notes</label>
+              <textarea className="field-input" name="notes" rows={2} />
+            </div>
 
-              <div className="field-type textarea" style={{ marginBottom: '1.5rem' }}>
-                <label className="field-label">Notes</label>
-                <textarea className="field-input" name="notes" rows={2} />
-              </div>
-
-              <div className={styles.formActions}>
-                <button
-                  type="button"
-                  className="btn btn--style-secondary"
-                  onClick={() => setModalItemId(null)}
-                  disabled={recording[modalItem.id]}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={recording[modalItem.id]}
-                  className="btn btn--style-primary"
-                >
-                  {recording[modalItem.id] ? 'Creating...' : 'Create Transaction'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+            <div className={styles.formActions}>
+              <button
+                type="button"
+                className="btn btn--style-secondary"
+                onClick={() => setModalItemId(null)}
+                disabled={recording[modalItem.id]}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={recording[modalItem.id]}
+                className="btn btn--style-primary"
+              >
+                {recording[modalItem.id] ? 'Creating...' : 'Create Transaction'}
+              </button>
+            </div>
+          </form>
+        </Modal>
       )}
     </div>
   )
