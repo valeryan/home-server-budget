@@ -2,8 +2,8 @@
 
 import { Gutter } from '@payloadcms/ui'
 import React, { useEffect, useState } from 'react'
-import { BudgetDashboard } from './BudgetDashboard'
-import { WizardDashboard } from './WizardDashboard'
+import { BudgetDashboard } from '../BudgetDashboard'
+import { WizardDashboard } from '../WizardDashboard'
 
 interface SetupStatus {
   incomeCategories: number
@@ -104,5 +104,4 @@ const Dashboard: React.FC = () => {
   // Show budget dashboard if setup is complete
   return <BudgetDashboard automations={automations} />
 }
-
 export default Dashboard

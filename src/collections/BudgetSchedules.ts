@@ -57,7 +57,7 @@ export const BudgetSchedules: CollectionConfig = {
           name: 'budgetScheduleLabel',
           admin: {
             components: {
-              Field: '/components/FieldsetLabel#BudgetScheduleLabel',
+              Field: '/components/FieldsetLabel/index#BudgetScheduleLabel',
             },
           },
         },
@@ -76,7 +76,7 @@ export const BudgetSchedules: CollectionConfig = {
           name: 'scheduleDetailsLabel',
           admin: {
             components: {
-              Field: '/components/FieldsetLabel#ScheduleDetailsLabel',
+              Field: '/components/FieldsetLabel/index#ScheduleDetailsLabel',
             },
             condition: (data) => !!data.scheduleType && scheduleRequiresDetails(data.scheduleType),
           },

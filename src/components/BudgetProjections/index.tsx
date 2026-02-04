@@ -2,6 +2,7 @@
 
 import { useDocumentInfo, useFormFields } from '@payloadcms/ui'
 import React, { useEffect, useState } from 'react'
+import styles from './styles.module.scss'
 
 interface Projections {
   startingBalance: number
@@ -82,64 +83,51 @@ export const BudgetProjections: React.FC = () => {
 
   if (projections.loading) {
     return (
-      <div
-        style={{
-          padding: '1rem',
-          backgroundColor: 'var(--theme-elevation-50)',
-          borderRadius: '4px',
-        }}
-      >
-        <p style={{ margin: 0, color: 'var(--theme-elevation-600)' }}>Calculating projections...</p>
+      <div className={styles.loadingContainer}>
+        <p className={styles.loadingText}>Calculating projections...</p>
       </div>
     )
   }
 
   return (
-    <div
-      style={{
-        padding: '1.5rem',
-        backgroundColor: 'var(--theme-elevation-50)',
-        borderRadius: '4px',
-        border: '1px solid var(--theme-elevation-150)',
-      }}
-    >
-      <h3 style={{ margin: '0 0 1rem 0', fontSize: '1rem', fontWeight: 600 }}>
+    <div className={styles.container}>
+      <h3 className={styles.title}>
         Budget Projections
       </h3>
 
-      <div style={{ display: 'grid', gap: '0.75rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ color: 'var(--theme-elevation-600)' }}>Starting Balance:</span>
-          <span style={{ fontWeight: 600 }}>${projections.startingBalance.toFixed(2)}</span>
+      <div className={styles.grid}>
+        <div className={styles.row}>
+          <span className={styles.label}>Starting Balance:</span>
+          <span className={styles.value}>${projections.startingBalance.toFixed(2)}</span>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ color: 'var(--theme-elevation-600)' }}>Current Account Balance:</span>
-          <span style={{ fontWeight: 600 }}>${projections.currentAccountBalance.toFixed(2)}</span>
+        <div className={styles.row}>
+          <span className={styles.label}>Current Account Balance:</span>
+          <span className={styles.value}>${projections.currentAccountBalance.toFixed(2)}</span>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ color: 'var(--theme-elevation-600)' }}>
+        <div className={styles.row}>
+          <span className={styles.label}>
             Income ({projections.incomeCount} items):
           </span>
-          <span style={{ fontWeight: 600, color: 'var(--theme-success-500)' }}>
+          <span className={`${styles.value} ${styles.income}`}>
             +${projections.income.toFixed(2)}
           </span>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ color: 'var(--theme-elevation-600)' }}>
+        <div className={styles.row}>
+          <span className={styles.label}>
             Expenses ({projections.expenseCount} items):
           </span>
-          <span style={{ fontWeight: 600, color: 'var(--theme-error-500)' }}>
+          <span className={`${styles.value} ${styles.expense}`}>
             -${projections.expenses.toFixed(2)}
           </span>
         </div>
 
         {(projections.transferInCount > 0 || projections.transferOutCount > 0) && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ color: 'var(--theme-elevation-600)' }}>Transfers:</span>
-            <span style={{ fontWeight: 600 }}>
+          <div className={styles.row}>
+            <span className={styles.label}>Transfers:</span>
+            <span className={styles.value}>
               {projections.transferInCount > 0 && `${projections.transferInCount} in`}
               {projections.transferInCount > 0 && projections.transferOutCount > 0 && ', '}
               {projections.transferOutCount > 0 && `${projections.transferOutCount} out`}
@@ -147,26 +135,12 @@ export const BudgetProjections: React.FC = () => {
           </div>
         )}
 
-        <div
-          style={{
-            marginTop: '0.5rem',
-            paddingTop: '0.75rem',
-            borderTop: '2px solid var(--theme-elevation-200)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <span style={{ fontWeight: 600, fontSize: '1.05rem' }}>Projected Balance:</span>
+        <div className={styles.projectedRow}>
+          <span className={styles.projectedLabel}>Projected Balance:</span>
           <span
-            style={{
-              fontWeight: 700,
-              fontSize: '1.25rem',
-              color:
-                projections.projectedBalance >= 0
-                  ? 'var(--theme-success-500)'
-                  : 'var(--theme-error-500)',
-            }}
+            className={`${styles.projectedValue} ${
+              projections.projectedBalance >= 0 ? styles.income : styles.expense
+            }`}
           >
             ${projections.projectedBalance.toFixed(2)}
           </span>

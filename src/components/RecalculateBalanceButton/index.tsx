@@ -2,6 +2,7 @@
 
 import { useDocumentInfo } from '@payloadcms/ui'
 import React, { useState } from 'react'
+import styles from './styles.module.scss'
 
 export const RecalculateBalanceButton: React.FC = () => {
   const [isRecalculating, setIsRecalculating] = useState(false)
@@ -56,18 +57,11 @@ export const RecalculateBalanceButton: React.FC = () => {
   }
 
   return (
-    <div
-      style={{
-        padding: 'var(--spacing-m)',
-        background: 'var(--theme-elevation-50)',
-        border: '1px solid var(--theme-elevation-150)',
-        borderRadius: 'var(--border-radius)',
-      }}
-    >
-      <h3 style={{ marginBottom: 'var(--spacing-s)', fontSize: '1rem', fontWeight: '600' }}>
+    <div className={styles.container}>
+      <h3 className={styles.title}>
         Balance Management
       </h3>
-      <p style={{ marginBottom: 'var(--spacing-m)', color: 'var(--theme-elevation-600)' }}>
+      <p className={styles.description}>
         If the current balance seems incorrect, you can recalculate it from the starting balance and
         all transactions.
       </p>
@@ -80,16 +74,7 @@ export const RecalculateBalanceButton: React.FC = () => {
         {isRecalculating ? 'Recalculating...' : '🔄 Recalculate Balance'}
       </button>
       {result && (
-        <pre
-          style={{
-            marginTop: 'var(--spacing-m)',
-            padding: 'var(--spacing-s)',
-            background: 'var(--theme-elevation-0)',
-            borderRadius: 'var(--border-radius)',
-            fontSize: '0.875rem',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
+        <pre className={styles.result}>
           {result}
         </pre>
       )}

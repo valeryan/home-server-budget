@@ -1,5 +1,6 @@
 import { calculateStartingBalance } from '@/lib/budgetCalculations'
 import { getSchedule } from '@/lib/schedules'
+import { getFirstOccurrenceDate } from '@/lib/schedules/utils'
 import config from '@payload-config'
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
@@ -209,6 +210,7 @@ export async function GET(request: NextRequest) {
             typeof txn.incomeDetails?.payee === 'object' && txn.incomeDetails?.payee
               ? txn.incomeDetails.payee.name
               : null,
+          dueDate: txn.date,
           isActual: true,
         })
       } else if (txn.type === 'expense') {
@@ -238,6 +240,7 @@ export async function GET(request: NextRequest) {
             typeof txn.expenseDetails?.payee === 'object' && txn.expenseDetails?.payee
               ? txn.expenseDetails.payee.name
               : null,
+          dueDate: txn.date,
           isActual: true,
         })
       } else if (txn.type === 'transfer') {
@@ -260,6 +263,7 @@ export async function GET(request: NextRequest) {
               typeof txn.transferDetails?.toAccount === 'object' && txn.transferDetails?.toAccount
                 ? txn.transferDetails.toAccount.name
                 : null,
+            dueDate: txn.date,
             isActual: true,
           })
         }
@@ -275,6 +279,7 @@ export async function GET(request: NextRequest) {
             otherAccountId: txnAccountId || null,
             otherAccountName:
               typeof txn.account === 'object' && txn.account ? txn.account.name : null,
+            dueDate: txn.date,
             isActual: true,
           })
         }
@@ -301,6 +306,14 @@ export async function GET(request: NextRequest) {
 
       if (!matchesPeriod) return
 
+      const firstOccurrence = getFirstOccurrenceDate(
+        scheduleType as string,
+        item as unknown as Record<string, unknown>,
+        periodStart,
+        periodEnd,
+      )
+      const dueDate = firstOccurrence ? firstOccurrence.toISOString() : null
+
       if (item.itemType === 'income') {
         income += item.amount
         incomeCount++
@@ -319,6 +332,7 @@ export async function GET(request: NextRequest) {
           payeeId:
             typeof item.payee === 'object' && item.payee ? item.payee.id : item.payee || null,
           payeeName: typeof item.payee === 'object' && item.payee ? item.payee.name : null,
+          dueDate,
           isActual: false,
         })
       } else if (item.itemType === 'expense') {
@@ -339,6 +353,7 @@ export async function GET(request: NextRequest) {
           payeeId:
             typeof item.payee === 'object' && item.payee ? item.payee.id : item.payee || null,
           payeeName: typeof item.payee === 'object' && item.payee ? item.payee.name : null,
+          dueDate,
           isActual: false,
         })
       } else if (item.itemType === 'transfer') {
@@ -370,6 +385,7 @@ export async function GET(request: NextRequest) {
               'name' in itemData.toAccount
                 ? (itemData.toAccount as { name: string }).name
                 : null,
+            dueDate,
             isActual: false,
           })
         }
@@ -389,6 +405,7 @@ export async function GET(request: NextRequest) {
               'name' in itemData.fromAccount
                 ? (itemData.fromAccount as { name: string }).name
                 : null,
+            dueDate,
             isActual: false,
           })
         }

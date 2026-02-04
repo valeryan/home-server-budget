@@ -12,7 +12,7 @@ export const RecurringItems: CollectionConfig = {
     description: 'Recurring income, expenses, and transfers',
     group: '⚙️ System',
 
-    defaultColumns: ['name', 'itemType', 'category', 'amount', 'account', 'scheduleType'],
+    defaultColumns: ['name', 'itemType', 'category', 'payee', 'amount', 'account', 'scheduleType'],
     listSearchableFields: ['name'],
   },
   access: {
@@ -25,7 +25,7 @@ export const RecurringItems: CollectionConfig = {
       admin: {
         hidden: true,
         components: {
-          Cell: '/components/RecurringItemCategoryCell#RecurringItemCategoryCell',
+          Cell: '/components/RecurringItemCategoryCell/index#RecurringItemCategoryCell',
         },
       },
     },
@@ -34,9 +34,9 @@ export const RecurringItems: CollectionConfig = {
       type: 'select',
       required: true,
       options: [
-        { label: '💰 Income', value: 'income' },
-        { label: '💳 Expense', value: 'expense' },
-        { label: '↔️ Transfer', value: 'transfer' },
+        { label: 'Income', value: 'income' },
+        { label: 'Expense', value: 'expense' },
+        { label: 'Transfer', value: 'transfer' },
       ],
       admin: {
         description: 'What type of recurring item is this?',
@@ -54,7 +54,7 @@ export const RecurringItems: CollectionConfig = {
       min: 0,
       admin: {
         components: {
-          Cell: '/components/CurrencyCell#CurrencyCell',
+          Cell: '/components/CurrencyCell/index#CurrencyCell',
         },
       },
     },
@@ -168,7 +168,7 @@ export const RecurringItems: CollectionConfig = {
           name: 'recurringScheduleLabel',
           admin: {
             components: {
-              Field: '/components/FieldsetLabel#RecurringScheduleLabel',
+              Field: '/components/FieldsetLabel/index#RecurringScheduleLabel',
             },
           },
         },
@@ -186,7 +186,7 @@ export const RecurringItems: CollectionConfig = {
           name: 'scheduleDetailsLabel',
           admin: {
             components: {
-              Field: '/components/FieldsetLabel#ScheduleDetailsLabel',
+              Field: '/components/FieldsetLabel/index#ScheduleDetailsLabel',
             },
             condition: (data) => !!data.scheduleType && scheduleRequiresDetails(data.scheduleType),
           },

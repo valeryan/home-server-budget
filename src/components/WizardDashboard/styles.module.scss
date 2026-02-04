@@ -1,0 +1,241 @@
+@use '../../styles/variables' as *;
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.title {
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+.intro {
+  margin-bottom: 2rem;
+  color: var(--theme-elevation-800);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+// Section styling
+.section {
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 0;
+}
+
+.sectionDesc {
+  margin-bottom: 1rem;
+  color: var(--theme-elevation-700);
+  font-size: 1rem;
+}
+
+.card {
+  background: var(--theme-elevation-50);
+  padding: 1.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--theme-elevation-150);
+}
+
+// Foundation Data specifics
+.completionText {
+  margin: 0 0 1rem 0;
+  font-weight: 500;
+  color: var(--theme-success-600);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  font-size: 0.875rem;
+}
+
+.link {
+  color: var(--theme-success-500);
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.tip {
+  margin-top: 1rem;
+  margin-bottom: 0;
+  font-size: 0.875rem;
+  color: var(--theme-elevation-600);
+}
+
+.warningText {
+  margin: 0;
+  color: var(--theme-warning-500);
+}
+
+// Completion Modal/Card
+.completionCard {
+  background: var(--theme-success-100);
+  color: var(--theme-success-900);
+  padding: 2rem;
+  border-radius: 0.25rem;
+  text-align: center;
+  border: 1px solid var(--theme-success-300);
+  margin-bottom: 2rem;
+}
+
+.completionEmoji {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.completionTitle {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.completionDesc {
+  margin: 0 0 1.5rem 0;
+  font-size: 1rem;
+}
+
+.nextButton {
+  display: inline-block;
+}
+
+// Help Grid
+.helpGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+// Setup Step Component
+.stepCard {
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  background: var(--theme-bg);
+  border-radius: 0.25rem;
+  border: 1px solid var(--theme-elevation-150);
+  border-left-width: 4px;
+  border-left-style: solid;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.stepComplete {
+  border-left-color: var(--theme-success-500);
+}
+
+.stepIncomplete {
+  border-left-color: var(--theme-warning-500);
+}
+
+.stepContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.stepBody {
+  flex: 1;
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.stepBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.badgeComplete {
+  background: var(--theme-success-500);
+}
+
+.badgeIncomplete {
+  background: var(--theme-warning-500);
+}
+
+.stepTitle {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.requiredStar {
+  color: var(--theme-error-500);
+  margin-left: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.stepDesc {
+  margin: 0;
+  margin-left: 44px;
+  color: var(--theme-elevation-700);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.stepActions {
+  margin-left: 1.5rem;
+  text-align: right;
+}
+
+.stepCount {
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.countComplete {
+  color: var(--theme-success-500);
+}
+
+.countIncomplete {
+  color: var(--theme-elevation-400);
+}
+
+// Resource Card
+.resourceCard {
+  background: var(--theme-elevation-50);
+  padding: 1.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--theme-elevation-150);
+}
+
+.resourceEmoji {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.resourceTitle {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.resourceDesc {
+  margin: 0;
+  color: var(--theme-elevation-700);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}

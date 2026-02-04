@@ -47,7 +47,7 @@ export const Accounts: CollectionConfig = {
       admin: {
         description: 'The initial balance of this account',
         components: {
-          Cell: '/components/CurrencyCell#CurrencyCell',
+          Cell: '/components/CurrencyCell/index#CurrencyCell',
         },
       },
     },
@@ -60,7 +60,7 @@ export const Accounts: CollectionConfig = {
         description: 'The current balance (updated automatically by transactions)',
         readOnly: true,
         components: {
-          Cell: '/components/CurrencyCell#CurrencyCell',
+          Cell: '/components/CurrencyCell/index#CurrencyCell',
         },
       },
     },
@@ -69,7 +69,7 @@ export const Accounts: CollectionConfig = {
       name: 'recalculateBalance',
       admin: {
         components: {
-          Field: '/components/RecalculateBalanceButton#RecalculateBalanceButton',
+          Field: '/components/RecalculateBalanceButton/index#RecalculateBalanceButton',
         },
         position: 'sidebar',
       },
@@ -107,7 +107,7 @@ export const Accounts: CollectionConfig = {
           name: 'compoundingScheduleLabel',
           admin: {
             components: {
-              Field: '/components/FieldsetLabel#CompoundingScheduleLabel',
+              Field: '/components/FieldsetLabel/index#CompoundingScheduleLabel',
             },
           },
         },
@@ -125,7 +125,7 @@ export const Accounts: CollectionConfig = {
           name: 'scheduleDetailsLabel',
           admin: {
             components: {
-              Field: '/components/FieldsetLabel#ScheduleDetailsLabel',
+              Field: '/components/FieldsetLabel/index#ScheduleDetailsLabel',
             },
             condition: (data) => !!data.scheduleType && scheduleRequiresDetails(data.scheduleType),
           },

@@ -1,0 +1,10 @@
+// Global Sass variables and mixins
+// Payload CMS provides CSS variables for theming (e.g. var(--theme-elevation-0))
+// We can define Sass helpers here if needed.
+
+// Example: Media query mixin
+@mixin media-min($width) {
+  @media (min-width: $width) {
+    @content;
+  }
+}
