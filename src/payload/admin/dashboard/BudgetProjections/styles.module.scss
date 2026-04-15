@@ -1,0 +1,71 @@
+@use '../../../../styles/variables' as *;
+
+.container {
+  padding: 1.5rem;
+  background-color: var(--theme-elevation-50);
+  border-radius: 4px;
+  border: 1px solid var(--theme-elevation-150);
+}
+
+.loadingContainer {
+  padding: 1rem;
+  background-color: var(--theme-elevation-50);
+  border-radius: 4px;
+}
+
+.loadingText {
+  margin: 0;
+  color: var(--theme-elevation-600);
+}
+
+.title {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label {
+  color: var(--theme-elevation-600);
+}
+
+.value {
+  font-weight: 600;
+}
+
+.income {
+  color: var(--theme-success-500);
+}
+
+.expense {
+  color: var(--theme-error-500);
+}
+
+.projectedRow {
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 2px solid var(--theme-elevation-200);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.projectedLabel {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.projectedValue {
+  font-weight: 700;
+  font-size: 1.25rem;
+}

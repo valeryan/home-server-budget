@@ -1,4 +1,4 @@
-import { autoAdvanceBudgets } from '@/lib/budgetScheduleUtils'
+import { autoAdvanceBudgets } from '@/domain/budgets/autoAdvance'
 import configPromise from '@payload-config'
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'

@@ -78,7 +78,9 @@ export interface Config {
     budgets: Budget;
     'budget-items': BudgetItem;
     'budget-schedules': BudgetSchedule;
+    'match-rules': MatchRule;
     'app-settings': AppSetting;
+    'teller-insights': TellerInsight;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -97,7 +99,9 @@ export interface Config {
     budgets: BudgetsSelect<false> | BudgetsSelect<true>;
     'budget-items': BudgetItemsSelect<false> | BudgetItemsSelect<true>;
     'budget-schedules': BudgetSchedulesSelect<false> | BudgetSchedulesSelect<true>;
+    'match-rules': MatchRulesSelect<false> | MatchRulesSelect<true>;
     'app-settings': AppSettingsSelect<false> | AppSettingsSelect<true>;
+    'teller-insights': TellerInsightsSelect<false> | TellerInsightsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -110,9 +114,10 @@ export interface Config {
   globals: {};
   globalsSelect: {};
   locale: null;
-  user: User & {
-    collection: 'users';
+  widgets: {
+    collections: CollectionsWidget;
   };
+  user: User;
   jobs: {
     tasks: unknown;
     workflows: unknown;
@@ -159,6 +164,7 @@ export interface User {
       }[]
     | null;
   password?: string | null;
+  collection: 'users';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -227,6 +233,14 @@ export interface Payee {
 export interface Account {
   id: string;
   name: string;
+  /**
+   * Manual accounts are managed entirely in this app. Connected accounts sync transactions from your bank via Teller.
+   */
+  accountSource: 'manual' | 'teller';
+  /**
+   * Show this account by default on the frontend dashboard
+   */
+  isDefault?: boolean | null;
   description?: string | null;
   accountType: 'checking' | 'savings' | 'credit_card' | 'cash' | 'investment' | 'other';
   /**
@@ -304,6 +318,26 @@ export interface Account {
    * Which month does this occur?
    */
   month?: ('1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12') | null;
+  /**
+   * Teller account ID (set automatically during Teller Connect)
+   */
+  tellerAccountId?: string | null;
+  /**
+   * Teller enrollment ID (set automatically)
+   */
+  tellerEnrollmentId?: string | null;
+  /**
+   * Bank/institution name from Teller
+   */
+  tellerInstitutionName?: string | null;
+  /**
+   * Teller access token (set during Teller Connect)
+   */
+  tellerAccessToken?: string | null;
+  /**
+   * When transactions were last pulled from Teller
+   */
+  tellerLastSyncedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -322,6 +356,14 @@ export interface Transaction {
   account: string | Account;
   type: 'income' | 'expense' | 'transfer';
   description: string;
+  /**
+   * Human-readable name shown in lists (e.g. "Sam's Club"). Auto-populated from payee or AI suggestion.
+   */
+  displayTitle?: string | null;
+  /**
+   * The merchant or person this transaction is with
+   */
+  payee?: (string | null) | Payee;
   amount: number;
   incomeDetails?: {
     category?: (string | null) | IncomeCategory;
@@ -342,6 +384,19 @@ export interface Transaction {
    * Has this transaction been reconciled with your bank statement?
    */
   reconciled?: boolean | null;
+  /**
+   * Unique ID from Teller (used to prevent duplicate imports)
+   */
+  tellerTransactionId?: string | null;
+  syncSource?: ('manual' | 'teller') | null;
+  /**
+   * How this transaction was categorized/matched
+   */
+  matchConfidence?: ('manual' | 'auto_rule' | 'auto_ai' | 'unmatched') | null;
+  /**
+   * The recurring item this transaction was matched to (set during sync)
+   */
+  matchedRecurringItem?: (string | null) | RecurringItem;
   updatedAt: string;
   createdAt: string;
 }
@@ -643,6 +698,61 @@ export interface BudgetSchedule {
   createdAt: string;
 }
 /**
+ * Auto-categorization and recurring item matching rules for synced transactions
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "match-rules".
+ */
+export interface MatchRule {
+  id: string;
+  /**
+   * Human-readable label, e.g. "Netflix subscription"
+   */
+  name: string;
+  /**
+   * Substring or /regex/ to match against the raw transaction description (case-insensitive)
+   */
+  descriptionPattern: string;
+  /**
+   * Optionally restrict to a specific transaction type
+   */
+  transactionType?: ('any' | 'income' | 'expense' | 'transfer') | null;
+  /**
+   * Minimum amount (inclusive). Leave blank for no lower bound.
+   */
+  amountMin?: number | null;
+  /**
+   * Maximum amount (inclusive). Leave blank for no upper bound.
+   */
+  amountMax?: number | null;
+  /**
+   * When this rule matches, link the transaction to this recurring item and auto-record its budget item
+   */
+  recurringItem?: (string | null) | RecurringItem;
+  /**
+   * Payee to assign to matching transactions
+   */
+  payee?: (string | null) | Payee;
+  /**
+   * Expense category to assign when this rule matches
+   */
+  expenseCategory?: (string | null) | ExpenseCategory;
+  /**
+   * Income category to assign when this rule matches
+   */
+  incomeCategory?: (string | null) | IncomeCategory;
+  /**
+   * Higher number = evaluated first. Useful when multiple rules could match.
+   */
+  priority?: number | null;
+  /**
+   * Disabled rules are ignored during matching
+   */
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "app-settings".
  */
@@ -652,6 +762,86 @@ export interface AppSetting {
    * Marks whether the initial setup wizard has been completed.
    */
   wizardComplete?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * AI-generated categorization suggestions for synced transactions, pending review
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teller-insights".
+ */
+export interface TellerInsight {
+  id: string;
+  /**
+   * Normalized description key used for deduplication (auto-generated)
+   */
+  descriptionKey: string;
+  /**
+   * Exact description text from the bank (for display and rule creation)
+   */
+  exampleDescription: string;
+  transactionType: 'expense' | 'income' | 'transfer';
+  /**
+   * Amount from the transaction that triggered this analysis
+   */
+  exampleAmount?: number | null;
+  /**
+   * Ollama's cleaned merchant / payee name (raw string)
+   */
+  suggestedPayee?: string | null;
+  /**
+   * Matched Payee record for Ollama's suggestion (auto-resolved; null if no payee record matched)
+   */
+  suggestedPayeeLink?: (string | null) | Payee;
+  /**
+   * Ollama's suggested expense category
+   */
+  suggestedExpenseCategory?: (string | null) | ExpenseCategory;
+  /**
+   * Ollama's suggested income category
+   */
+  suggestedIncomeCategory?: (string | null) | IncomeCategory;
+  /**
+   * Recurring items identified as possible matches based on amount and timing
+   */
+  suggestedRecurringItems?: (string | RecurringItem)[] | null;
+  /**
+   * Ollama's stated confidence level
+   */
+  ollamaConfidence?: ('high' | 'medium' | 'low') | null;
+  /**
+   * Set to Accepted to confirm values and auto-create a MatchRule for future syncs
+   */
+  status?: ('pending' | 'accepted' | 'rejected') | null;
+  /**
+   * Payee to assign (defaults to suggestedPayeeLink; create a new Payee record first if needed)
+   */
+  acceptedPayee?: (string | null) | Payee;
+  /**
+   * The expense category to use (defaults to suggested; override before accepting)
+   */
+  acceptedExpenseCategory?: (string | null) | ExpenseCategory;
+  /**
+   * The income category to use (defaults to suggested; override before accepting)
+   */
+  acceptedIncomeCategory?: (string | null) | IncomeCategory;
+  /**
+   * The recurring item to link (pick from suggestedRecurringItems or choose manually)
+   */
+  acceptedRecurringItem?: (string | null) | RecurringItem;
+  /**
+   * Raw Ollama response (for debugging)
+   */
+  ollamaRaw?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -724,8 +914,16 @@ export interface PayloadLockedDocument {
         value: string | BudgetSchedule;
       } | null)
     | ({
+        relationTo: 'match-rules';
+        value: string | MatchRule;
+      } | null)
+    | ({
         relationTo: 'app-settings';
         value: string | AppSetting;
+      } | null)
+    | ({
+        relationTo: 'teller-insights';
+        value: string | TellerInsight;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -845,6 +1043,8 @@ export interface PayeesSelect<T extends boolean = true> {
  */
 export interface AccountsSelect<T extends boolean = true> {
   name?: T;
+  accountSource?: T;
+  isDefault?: T;
   description?: T;
   accountType?: T;
   startingBalance?: T;
@@ -856,6 +1056,11 @@ export interface AccountsSelect<T extends boolean = true> {
   anchorDate?: T;
   dayOfMonth?: T;
   month?: T;
+  tellerAccountId?: T;
+  tellerEnrollmentId?: T;
+  tellerInstitutionName?: T;
+  tellerAccessToken?: T;
+  tellerLastSyncedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -868,6 +1073,8 @@ export interface TransactionsSelect<T extends boolean = true> {
   account?: T;
   type?: T;
   description?: T;
+  displayTitle?: T;
+  payee?: T;
   amount?: T;
   incomeDetails?:
     | T
@@ -888,6 +1095,10 @@ export interface TransactionsSelect<T extends boolean = true> {
       };
   notes?: T;
   reconciled?: T;
+  tellerTransactionId?: T;
+  syncSource?: T;
+  matchConfidence?: T;
+  matchedRecurringItem?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -971,10 +1182,53 @@ export interface BudgetSchedulesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "match-rules_select".
+ */
+export interface MatchRulesSelect<T extends boolean = true> {
+  name?: T;
+  descriptionPattern?: T;
+  transactionType?: T;
+  amountMin?: T;
+  amountMax?: T;
+  recurringItem?: T;
+  payee?: T;
+  expenseCategory?: T;
+  incomeCategory?: T;
+  priority?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "app-settings_select".
  */
 export interface AppSettingsSelect<T extends boolean = true> {
   wizardComplete?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teller-insights_select".
+ */
+export interface TellerInsightsSelect<T extends boolean = true> {
+  descriptionKey?: T;
+  exampleDescription?: T;
+  transactionType?: T;
+  exampleAmount?: T;
+  suggestedPayee?: T;
+  suggestedPayeeLink?: T;
+  suggestedExpenseCategory?: T;
+  suggestedIncomeCategory?: T;
+  suggestedRecurringItems?: T;
+  ollamaConfidence?: T;
+  status?: T;
+  acceptedPayee?: T;
+  acceptedExpenseCategory?: T;
+  acceptedIncomeCategory?: T;
+  acceptedRecurringItem?: T;
+  ollamaRaw?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1017,6 +1271,16 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "collections_widget".
+ */
+export interface CollectionsWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

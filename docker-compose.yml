@@ -1,28 +1,32 @@
 services:
   payload:
-    image: node:18-alpine
+    image: node:24-alpine
     container_name: budget-payload
     restart: unless-stopped
     working_dir: /home/node/app/
     volumes:
       - .:/home/node/app
       - node_modules:/home/node/app/node_modules
-    command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm dev"
+    command: sh -c "npm install && npm run generate:types && npm run build && npm start"
     depends_on:
       - mongo
+      - ollama
     env_file:
       - .env
     environment:
-      # --- nginx-proxy / letsencrypt wiring ---
-      - VIRTUAL_HOST=${HOST}            # e.g. budget.samuelhilson.com
-      - VIRTUAL_PATH=/                  # serve Payload at root
-      - VIRTUAL_NETWORK=${PROXY_HOST}   # e.g. home-server_proxy-tier
+      # --- Reverse-proxy wiring from the separate valeryan/home-server stack ---
+      - VIRTUAL_HOST=${HOST} # e.g. budget.samuelhilson.com
+      - VIRTUAL_PATH=/ # serve Payload at root
+      - VIRTUAL_NETWORK=${PROXY_HOST} # network exposed by the home-server proxy stack
       - VIRTUAL_PORT=3000
       - LETSENCRYPT_HOST=${HOST}
       - LETSENCRYPT_EMAIL=${LE_EMAIL}
       - SERVER_URL=https://${HOST}
       # Tell Next.js it's behind a proxy
       - HOSTNAME=0.0.0.0
+      # Ollama LLM sidecar
+      - OLLAMA_URL=http://ollama:11434
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-gemma4:e2b}
     networks:
       - proxy-net
 
@@ -42,11 +46,27 @@ services:
     networks:
       - proxy-net
 
+  # Ollama sidecar for local model serving
+  ollama:
+    image: ollama/ollama:latest
+    container_name: budget-ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+      - ./scripts/ollama-entrypoint.sh:/usr/local/bin/ollama-entrypoint.sh:ro
+    networks:
+      - proxy-net
+    # Pull the configured model on startup if it is not already cached.
+    entrypoint: ["/bin/sh", "/usr/local/bin/ollama-entrypoint.sh"]
+
 volumes:
   data:
   node_modules:
+  ollama_data:
 
 networks:
   proxy-net:
+    # This external network is created and managed by:
+    # https://github.com/valeryan/home-server
     name: home-server_proxy-tier
     external: true

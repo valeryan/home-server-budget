@@ -1,0 +1,204 @@
+@use '../../../../styles/variables' as *;
+
+.section {
+  margin-top: 3rem;
+}
+
+.tableHeader {
+  margin-bottom: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.count {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--theme-elevation-500);
+}
+
+.tableContainer {
+  background-color: var(--theme-elevation-0);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 3rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.colName {
+  width: 32%;
+}
+
+.colCategory {
+  width: 18%;
+}
+
+.colPayee {
+  width: 22%;
+}
+
+.colAmount {
+  width: 14%;
+}
+
+.colAction {
+  width: 14%;
+}
+
+.tableHeadRow {
+  border-bottom: 1px solid var(--theme-elevation-200);
+  background-color: var(--theme-elevation-50);
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--theme-elevation-500);
+  font-weight: 600;
+
+  th {
+    padding: 0.75rem;
+  }
+}
+
+.tableRow {
+  border-bottom: 1px solid var(--theme-elevation-200);
+  transition: background-color 0.2s;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &:hover {
+    background-color: var(--theme-elevation-50);
+  }
+
+  td {
+    padding: 0.75rem;
+  }
+}
+
+.itemName {
+  font-weight: 500;
+}
+
+.itemDetails {
+  font-size: 0.875rem;
+  color: var(--theme-elevation-500);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.categoryCell {
+  font-size: 0.875rem;
+  color: var(--theme-elevation-500);
+}
+
+.payeeCell {
+  font-size: 0.875rem;
+  color: var(--theme-elevation-500);
+}
+
+.categoryTag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  background-color: var(--theme-elevation-100);
+  font-size: 0.75rem;
+}
+
+.amountCell {
+  text-align: right;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.actionCell {
+  text-align: right;
+  width: 120px;
+  white-space: nowrap;
+
+  button {
+    padding: 0.25rem 0.5rem; // Explicit padding for small buttons if class fails
+  }
+}
+
+.emptyState {
+  padding: 3rem;
+  text-align: center;
+  color: var(--theme-elevation-500);
+  font-style: italic;
+  background-color: var(--theme-elevation-0);
+  border-radius: 4px;
+  border: 1px solid var(--theme-elevation-200);
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+}
+
+.modalCard {
+  background: var(--theme-elevation-0);
+  border-radius: 0.75rem;
+  border: 1px solid var(--theme-elevation-200);
+  width: min(720px, 100%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  padding: 1.5rem;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+
+  button {
+    padding: 0.625rem 1.25rem;
+  }
+}

@@ -1,0 +1,261 @@
+@use '../../../../styles/variables' as *;
+
+.container {
+  margin-bottom: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.headerNav {
+  display: flex;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-width: 220px;
+}
+
+.title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--theme-elevation-500);
+  letter-spacing: 0.025em;
+  margin: 0;
+}
+
+.periodLabel {
+  font-size: 0.75rem;
+  color: var(--theme-elevation-500);
+}
+
+.periodRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.statusBadge {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid var(--theme-elevation-200);
+  color: var(--theme-elevation-600);
+}
+
+.statusplanning {
+  background-color: var(--theme-elevation-100);
+  color: var(--theme-elevation-600);
+}
+
+.statusactive {
+  background-color: rgba(var(--theme-success-500-rgb), 0.1);
+  color: var(--theme-success-500);
+}
+
+.statusclosed {
+  background-color: var(--theme-elevation-200);
+  color: var(--theme-elevation-600);
+}
+
+.currentBalance {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  color: var(--theme-elevation-500);
+}
+
+.value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--theme-elevation-800);
+  font-variant-numeric: tabular-nums;
+}
+
+.subtext {
+  font-size: 0.75rem;
+  color: var(--theme-elevation-500);
+  margin-top: auto; // Push to bottom if flex column
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  width: 100%;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media (min-width: 1280px) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.card {
+  background-color: var(--theme-elevation-0);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--theme-elevation-200);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: center;
+}
+
+.cardLabel {
+  font-size: 0.75rem;
+  color: var(--theme-elevation-500);
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  text-align: left;
+  width: 100%;
+}
+
+.cardValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  text-align: center;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+  display: block;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+  width: 100%;
+  text-align: left;
+}
+
+.cardHeader,
+.cardLabel {
+  min-height: 1.25rem;
+}
+
+.cardHeader + .cardValue {
+  margin-top: 0.25rem;
+}
+
+.cardLabel + .cardValue {
+  margin-top: 0.25rem;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-weight: 500;
+}
+
+.badgeSuccess {
+  background-color: rgba(var(--theme-success-500-rgb), 0.1); // Assuming rgb vars exist, else fallback opacity
+  color: var(--theme-success-500);
+  // Fallback if RGB vars aren't available usually standard in Payload
+  background-color: var(--theme-success-100); 
+}
+
+.badgeError {
+  background-color: var(--theme-error-100);
+  color: var(--theme-error-500);
+}
+
+.textSuccess {
+  color: var(--theme-success-500);
+}
+
+.textError {
+  color: var(--theme-error-500);
+}
+
+.projectedCard {
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.progressBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 0.25rem;
+  width: 100%;
+  z-index: 0;
+}
+
+.bgSuccessLow {
+  background-color: var(--theme-success-100);
+}
+
+.bgErrorLow {
+  background-color: var(--theme-error-100);
+}
+
+.secondaryStats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.secondaryCard {
+  background-color: var(--theme-elevation-0);
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--theme-elevation-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.secondaryLabel {
+  font-size: 0.875rem;
+  color: var(--theme-elevation-500);
+}
+
+.secondaryValue {
+  font-weight: 500;
+}

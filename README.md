@@ -1,132 +1,174 @@
-# Home Budget Management System
+# Home Server Budget
 
-A Payload CMS-based budget management application designed to replace spreadsheet-based budgeting with a proper backend system.
+A household budgeting app built with Payload CMS, Next.js, and MongoDB.
 
-## Overview
+This project is intended to run on a home server behind an existing reverse proxy. In your setup, the app is exposed at `https://${HOST}` from `.env`, for example `https://budget.samuelhilson.com`.
 
-This application helps you manage your home budget by creating budget periods that align with your paycheck schedule. It features:
+It depends on the separate home-server proxy stack here:
 
-- **Use Relationships**: Relational data model on top of MongoDB
-- **Period-based tracking**: Create a new budget for each paycheck cycle
-- **Multiple accounts**: Track checking, savings, credit cards, etc.
-- **Planned vs Actual**: Compare budgeted amounts with actual spending
+- https://github.com/valeryan/home-server
 
-## Documentation
+The app gives you:
 
-- **[GETTING_STARTED.md](./GETTING_STARTED.md)** - Quick start guide and next steps
-- **[BUDGET_MODEL.md](./BUDGET_MODEL.md)** - Detailed data model documentation
-- **[src/seed-data.ts](./src/seed-data.ts)** - Initial data to populate your system
-- **[src/hooks/budgetPeriodHooks.example.ts](./src/hooks/budgetPeriodHooks.example.ts)** - Example automation hooks
+- an admin UI for managing accounts, categories, payees, recurring items, budgets, and transactions
+- a setup wizard for first-run configuration
+- budget planning and ledger views
+- optional Teller sync and optional Ollama-powered transaction insights
 
-## Collections Overview
+## Deployment Model
 
-The application includes the following collections:
+The primary deployment path for this repo is:
 
-### Configuration Collections
-- **Schedules**: Recurring schedule types (weekly, bi-weekly, monthly, etc.)
-- **Income Categories**: Categories for income items (Regular Pay, Bonus, etc.)
-- **Expense Categories**: Categories for expenses (Food, Utilities, Housing, etc.)
-- **Payees**: People and companies you receive money from or pay to
-- **Accounts**: Your financial accounts (checking, savings, credit cards, etc.)
+- Docker Compose on your home server
+- attached to the proxy Docker network provided by `valeryan/home-server`
+- publicly routed through the hostname in `HOST`
 
-### Templates (Recurring Items)
-- **RecurringItems**: Unified collection for all recurring income, expenses, and transfers that serve as your budget blueprints.
+The proxy-related variables in `.env` are part of the normal setup for this project, not optional extras for a separate deployment mode.
 
-### Budget Management
-- **Budget Periods**: Individual budget buckets (one per paycheck)
-  - References `BudgetItems` (does not embed them)
-- **Budget Items**: The actual instances of income/expenses for a specific period.
-- **Transactions**: Historical record of all financial movements (updates logical balances).
+## Requirements
 
-## Quick Start - Local Setup
+- Node.js `24.x`
+- `npm` `10+`
+- MongoDB
 
-To spin up this template locally, follow these steps:
+## Environment
 
-### Clone
+Copy the example file and fill in the values you need:
 
-After you click the `Deploy` button above, you'll want to have standalone copy of this repo on your machine. If you've already cloned this repo, skip to [Development](#development).
+```bash
+cp .env.example .env
+```
 
-### Development
+Required for the app:
 
-1. First clone the repo if you have not done so already
-2. `cp .env.example .env` to copy the example environment variables
-3. Add your MongoDB connection string to `MONGODB_URI` in `.env`
-4. Add a secure secret to `PAYLOAD_SECRET` in `.env`
-5. `pnpm install && pnpm dev` to install dependencies and start the dev server
-6. Open `http://localhost:3000/admin` to access the admin panel
-7. Create your first admin user
-8. Follow the [GETTING_STARTED.md](./GETTING_STARTED.md) guide to set up your budget
+- `DATABASE_URI`
+- `PAYLOAD_SECRET`
 
-That's it! Changes made in `./src` will be reflected in your app.
+Required for your home-server proxy deployment:
 
-#### Docker (Optional)
+- `HOST`
+- `PROXY_HOST`
+- `LE_EMAIL`
 
-If you prefer to use Docker for local development instead of a local MongoDB instance, the provided docker-compose.yml file can be used.
+Optional integrations:
 
-To do so, follow these steps:
+- `NEXT_PUBLIC_TELLER_APP_ID`
+- `NEXT_PUBLIC_TELLER_ENV`
+- `OLLAMA_URL`
+- `OLLAMA_MODEL`
 
-- Modify the `MONGODB_URI` in your `.env` file to `mongodb://127.0.0.1/<dbname>`
-- Modify the `docker-compose.yml` file's `MONGODB_URI` to match the above `<dbname>`
-- Run `docker-compose up` to start the database, optionally pass `-d` to run in the background.
+## Run On The Server
 
-## How It Works
+1. Copy the example env file:
 
-This budget system is designed around a template-based workflow:
+```bash
+cp .env.example .env
+```
 
-1. **Set up your configuration**: Add schedules, categories, payees, and accounts
-2. **Create templates**: Define your recurring income, expenses, and transfers
-3. **Create budget periods**: For each paycheck, create a new budget period
-4. **Track actuals**: Mark items as received/paid and update actual amounts
-5. **Monitor progress**: View summaries and track budget vs actual spending
+2. Set the public hostname and proxy values in `.env`.
 
-### Key Design Principles
+3. Make sure the `valeryan/home-server` stack is running and its proxy network matches `PROXY_HOST`.
 
-- **Relational**: Budget periods are linked to items, allowing independent management
-- **Template-based**: Recurring items are defined once and instantiated as BudgetItems
-- **Flexible**: Easy to add one-time items or adjust amounts per period
-- **Historical**: Past budget periods preserve data via the separate BudgetItems collection
+4. Start the stack:
 
-### Collections
+```bash
+docker compose up -d
+```
 
-### Authentication & Media
+5. Open the app at:
 
-See the [Collections](https://payloadcms.com/docs/configuration/collections) docs for details on how to extend this functionality.
+`https://${HOST}`
 
-- **Users**: Auth-enabled collection with access to the admin panel
-- **Media**: Upload-enabled collection for file storage
+6. Open the admin at:
 
-For additional help, see the official [Auth Example](https://github.com/payloadcms/payload/tree/main/examples/auth) or the [Authentication](https://payloadcms.com/docs/authentication/overview#authentication-overview) docs.
+`https://${HOST}/admin`
 
-## Next Steps
+7. Create your first admin user and complete the setup wizard.
 
-After getting the app running:
+## Local Development
 
-1. **Populate initial data** - Add schedules, categories, payees, and accounts (see [GETTING_STARTED.md](./GETTING_STARTED.md))
-2. **Create templates** - Define your recurring budget items
-3. **Build your first budget** - Create a budget period for your next paycheck
-4. **Add automation** - Implement hooks to auto-populate periods (see `src/hooks/budgetPeriodHooks.example.ts`)
-5. **Build a frontend** - Create a user-friendly interface for your wife to manage the budget
+Local development is supported, but it is not the primary workflow for this project.
 
-## Future Enhancements
+1. Install dependencies:
 
-- Auto-populate budget periods from templates
-- Auto-calculate summary totals
-- Account balance tracking with transaction hooks
-- Custom API endpoints for reporting
-- Budget vs actual comparison reports
-- Account balance history and forecasting
-- Mobile-friendly frontend
+```bash
+npm install
+```
 
-### Docker
+2. Start the app:
 
-Alternatively, you can use [Docker](https://www.docker.com) to spin up this template locally. To do so, follow these steps:
+```bash
+npm run dev
+```
 
-1. Follow [steps 1 and 2 from above](#development), the docker-compose file will automatically use the `.env` file in your project root
-1. Next run `docker-compose up`
-1. Follow [steps 4 and 5 from above](#development) to login and create your first admin user
+3. Open the admin locally:
 
-That's it! The Docker instance will help you get up and running quickly while also standardizing the development environment across your teams.
+`http://localhost:3000/admin`
 
-## Questions
+4. Create your first admin user.
 
-If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).
+5. Use the setup wizard in the admin dashboard to add or review:
+
+- income categories
+- expense categories
+- payees
+- accounts
+- recurring items
+
+The app seeds default income and expense categories on startup, so you can edit those instead of creating everything from scratch.
+
+## Production Build
+
+```bash
+npm run build
+npm start
+```
+
+## Docker Notes
+
+`docker-compose.yml` assumes the app will join the external proxy network created by:
+
+- https://github.com/valeryan/home-server
+
+Make sure:
+
+- `.env` contains the proxy-related values used by `docker-compose.yml`
+- `DATABASE_URI` points at the `mongo` service
+- the external Docker network referenced by `PROXY_HOST` exists because the home-server stack created it
+
+Start the stack with:
+
+```bash
+docker compose up
+```
+
+## Optional Integrations
+
+### Teller
+
+Teller sync requires:
+
+- `NEXT_PUBLIC_TELLER_APP_ID`
+- optional `NEXT_PUBLIC_TELLER_ENV`
+- client certificates at:
+  - `certs/certificate.pem`
+  - `certs/private_key.pem`
+
+Without those, the rest of the app still works.
+
+### Ollama
+
+Ollama-backed transaction insights are optional.
+
+Defaults used by the app:
+
+- `OLLAMA_URL=http://ollama:11434`
+- `OLLAMA_MODEL=qwen2.5:0.5b` in code
+- `docker-compose.yml` defaults `OLLAMA_MODEL` to `gemma4:e2b`
+
+If you want consistent behavior between local code and Docker, set `OLLAMA_MODEL` explicitly in `.env`.
+
+## Docs
+
+- [Getting Started](./docs/GETTING_STARTED.md)
+- [Budget Model](./docs/BUDGET_MODEL.md)

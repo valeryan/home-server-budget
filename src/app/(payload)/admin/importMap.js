@@ -1,11 +1,12 @@
-import { CurrencyCell as CurrencyCell_e9931122e518d0af19818119565ac2d2 } from '../../../components/CurrencyCell/index'
-import { RecalculateBalanceButton as RecalculateBalanceButton_183ab6d1e0f65c0127c343e4a6d2b091 } from '../../../components/RecalculateBalanceButton/index'
-import { CompoundingScheduleLabel as CompoundingScheduleLabel_2de7cf770016baf847dab39e05bf86d0 } from '../../../components/FieldsetLabel/index'
-import { ScheduleDetailsLabel as ScheduleDetailsLabel_2de7cf770016baf847dab39e05bf86d0 } from '../../../components/FieldsetLabel/index'
-import { CurrencyCell as CurrencyCell_ef9297f0eb6a2cfced1e545a414cb8b0 } from '../../../components/CurrencyCell'
-import { RecurringItemCategoryCell as RecurringItemCategoryCell_55554a2c3fc044af7a1e458bf04587c9 } from '../../../components/RecurringItemCategoryCell/index'
-import { RecurringScheduleLabel as RecurringScheduleLabel_2de7cf770016baf847dab39e05bf86d0 } from '../../../components/FieldsetLabel/index'
-import { BudgetProjections as BudgetProjections_a36a55bcc9743e4d7aa6d1493c00010c } from '../../../components/BudgetProjections'
+import { CurrencyCell as CurrencyCell_187d8c6b2be9afa35666da4bac633952 } from '@/payload/admin/cells/CurrencyCell'
+import { RecalculateBalanceButton as RecalculateBalanceButton_ec735b5abea6ad3ddd1c1073ac68978a } from '@/payload/admin/actions/RecalculateBalanceButton'
+import { CompoundingScheduleLabel as CompoundingScheduleLabel_e55c38b0610799dff194927497887f8f } from '@/payload/admin/fields/FieldsetLabel'
+import { ScheduleDetailsLabel as ScheduleDetailsLabel_e55c38b0610799dff194927497887f8f } from '@/payload/admin/fields/FieldsetLabel'
+import { TellerConnectButton as TellerConnectButton_aa6f7d1d9e3738771cf89ffcf9a9753c } from '@/payload/admin/actions/TellerConnectButton'
+import { SyncedTransactionBadge as SyncedTransactionBadge_8bd5e25f5160be951ad8245de997ab79 } from '@/payload/admin/cells/SyncedTransactionBadge'
+import { RecurringItemCategoryCell as RecurringItemCategoryCell_67442fdd1acccaaf9e1aeabee746048c } from '@/payload/admin/cells/RecurringItemCategoryCell'
+import { RecurringScheduleLabel as RecurringScheduleLabel_e55c38b0610799dff194927497887f8f } from '@/payload/admin/fields/FieldsetLabel'
+import { BudgetProjections as BudgetProjections_1f852a8a3ee13da5fd63fe96ef1eca8a } from '@/payload/admin/dashboard/BudgetProjections'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -29,19 +30,21 @@ import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93
 import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { BudgetScheduleLabel as BudgetScheduleLabel_2de7cf770016baf847dab39e05bf86d0 } from '../../../components/FieldsetLabel/index'
-import { DashboardNavLink as DashboardNavLink_77ac04268210385bfd3e07c6c763f3ac } from '../../../components/DashboardNavLink'
-import { default as default_b39f2d96c5778d5698b3c9e7777aa63a } from '@/components/Dashboard'
+import { BudgetScheduleLabel as BudgetScheduleLabel_e55c38b0610799dff194927497887f8f } from '@/payload/admin/fields/FieldsetLabel'
+import { DashboardNavLink as DashboardNavLink_34f4f063f1ac43b73109be1af4599a7d } from '@/payload/admin/nav/DashboardNavLink'
+import { default as default_59709678b921aca4b81cd3c7cb59209a } from '@/payload/admin/dashboard/Dashboard'
+import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
-  "/components/CurrencyCell/index#CurrencyCell": CurrencyCell_e9931122e518d0af19818119565ac2d2,
-  "/components/RecalculateBalanceButton/index#RecalculateBalanceButton": RecalculateBalanceButton_183ab6d1e0f65c0127c343e4a6d2b091,
-  "/components/FieldsetLabel/index#CompoundingScheduleLabel": CompoundingScheduleLabel_2de7cf770016baf847dab39e05bf86d0,
-  "/components/FieldsetLabel/index#ScheduleDetailsLabel": ScheduleDetailsLabel_2de7cf770016baf847dab39e05bf86d0,
-  "/components/CurrencyCell#CurrencyCell": CurrencyCell_ef9297f0eb6a2cfced1e545a414cb8b0,
-  "/components/RecurringItemCategoryCell/index#RecurringItemCategoryCell": RecurringItemCategoryCell_55554a2c3fc044af7a1e458bf04587c9,
-  "/components/FieldsetLabel/index#RecurringScheduleLabel": RecurringScheduleLabel_2de7cf770016baf847dab39e05bf86d0,
-  "/components/BudgetProjections#BudgetProjections": BudgetProjections_a36a55bcc9743e4d7aa6d1493c00010c,
+  "@/payload/admin/cells/CurrencyCell#CurrencyCell": CurrencyCell_187d8c6b2be9afa35666da4bac633952,
+  "@/payload/admin/actions/RecalculateBalanceButton#RecalculateBalanceButton": RecalculateBalanceButton_ec735b5abea6ad3ddd1c1073ac68978a,
+  "@/payload/admin/fields/FieldsetLabel#CompoundingScheduleLabel": CompoundingScheduleLabel_e55c38b0610799dff194927497887f8f,
+  "@/payload/admin/fields/FieldsetLabel#ScheduleDetailsLabel": ScheduleDetailsLabel_e55c38b0610799dff194927497887f8f,
+  "@/payload/admin/actions/TellerConnectButton#TellerConnectButton": TellerConnectButton_aa6f7d1d9e3738771cf89ffcf9a9753c,
+  "@/payload/admin/cells/SyncedTransactionBadge#SyncedTransactionBadge": SyncedTransactionBadge_8bd5e25f5160be951ad8245de997ab79,
+  "@/payload/admin/cells/RecurringItemCategoryCell#RecurringItemCategoryCell": RecurringItemCategoryCell_67442fdd1acccaaf9e1aeabee746048c,
+  "@/payload/admin/fields/FieldsetLabel#RecurringScheduleLabel": RecurringScheduleLabel_e55c38b0610799dff194927497887f8f,
+  "@/payload/admin/dashboard/BudgetProjections#BudgetProjections": BudgetProjections_1f852a8a3ee13da5fd63fe96ef1eca8a,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -65,7 +68,8 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#UnderlineFeatureClient": UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
-  "/components/FieldsetLabel/index#BudgetScheduleLabel": BudgetScheduleLabel_2de7cf770016baf847dab39e05bf86d0,
-  "/components/DashboardNavLink#DashboardNavLink": DashboardNavLink_77ac04268210385bfd3e07c6c763f3ac,
-  "@/components/Dashboard#default": default_b39f2d96c5778d5698b3c9e7777aa63a
+  "@/payload/admin/fields/FieldsetLabel#BudgetScheduleLabel": BudgetScheduleLabel_e55c38b0610799dff194927497887f8f,
+  "@/payload/admin/nav/DashboardNavLink#DashboardNavLink": DashboardNavLink_34f4f063f1ac43b73109be1af4599a7d,
+  "@/payload/admin/dashboard/Dashboard#default": default_59709678b921aca4b81cd3c7cb59209a,
+  "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

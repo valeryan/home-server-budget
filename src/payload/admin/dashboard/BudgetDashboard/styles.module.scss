@@ -1,0 +1,234 @@
+@use '../../../../styles/variables' as *;
+
+.gutter {
+  padding-left: var(--gutter-h);
+  padding-right: var(--gutter-h);
+}
+
+.dashboardContent {
+  padding-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+}
+
+.title {
+  margin-bottom: 0.5rem;
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin-top: 0;
+}
+
+.subtitle {
+  color: var(--theme-elevation-500);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.stalePrompt {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: #fff8e6;
+  border: 1px solid #f2d18b;
+  padding: 1rem 1.25rem;
+  border-radius: 0.5rem;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.stalePromptTitle {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.stalePromptMessage {
+  margin: 0;
+  color: #7a5a1b;
+  font-size: 0.875rem;
+}
+
+.stalePromptActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--theme-elevation-0);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: 0.25rem;
+  padding: 0 0.5rem;
+}
+
+.paginationButton {
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--theme-elevation-800);
+
+  &:hover {
+    background-color: var(--theme-elevation-50);
+  }
+}
+
+.paginationText {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.loading {
+  color: var(--theme-elevation-500);
+}
+
+.budgetNav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.budgetSelect {
+  min-width: 280px;
+}
+
+
+.splitLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(12, 1fr);
+  }
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  @media (min-width: 1024px) {
+    grid-column: span 6;
+  }
+}
+
+.rightColumn {
+  background-color: var(--theme-elevation-0);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--theme-elevation-200);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  @media (min-width: 1024px) {
+    grid-column: span 6;
+    position: sticky;
+    top: 2rem;
+  }
+}
+
+.card {
+  background-color: var(--theme-elevation-0);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--theme-elevation-200);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.cardHeader {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.dateBadge {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--theme-elevation-500);
+  background-color: var(--theme-elevation-50);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.transactionList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.emptyTransactions {
+  padding: 2rem;
+  text-align: center;
+  color: var(--theme-elevation-500);
+  font-style: italic;
+  border: 1px dashed var(--theme-elevation-200);
+  border-radius: 4px;
+}
+
+.emptyState {
+  background-color: var(--theme-elevation-0);
+  padding: 3rem;
+  border-radius: 4px;
+  border: 1px solid var(--theme-elevation-200);
+  text-align: center;
+}
+
+.emptyStateIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.emptyStateTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+.emptyStateText {
+  margin-bottom: 1.5rem;
+  color: var(--theme-elevation-500);
+}
+
+.noAutomationHeader {
+  margin-bottom: 1rem;
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-top: 0;
+}
