@@ -245,7 +245,7 @@ async function claimBudgetItem(
       and: [
         { budget: { equals: budget.id } },
         { recurringItem: { equals: recurringItemId } },
-        { isActual: { not_equals: true } },
+        { isActualized: { not_equals: true } },
       ],
     },
     limit: 1,
@@ -256,6 +256,6 @@ async function claimBudgetItem(
   await payload.update({
     collection: 'budget-items',
     id: budgetItems.docs[0].id,
-    data: { isActual: true, transaction: transactionId } as never,
+    data: { isActualized: true, transaction: transactionId } as never,
   })
 }
